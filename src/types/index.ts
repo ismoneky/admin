@@ -43,8 +43,8 @@ export interface SystemConfig {
   bookingEnabled: boolean
   bookingDisabledMessage: string
   banners: Banner[]
-  timeSlotLimit: TimeSlotLimit
-  paymentConfig: PaymentConfig
+  timeSlotLimitJson: string
+  paymentConfigJson: string
   createdAt: string
   updatedAt: string
 }
@@ -53,21 +53,19 @@ export interface UpdateSystemConfigDto {
   bookingEnabled?: boolean
   bookingDisabledMessage?: string
   banners?: Banner[]
-  timeSlotLimit?: TimeSlotLimit
-  paymentConfig?: PaymentConfig
+  timeSlotLimitJson?: string
+  paymentConfigJson?: string
 }
 
 // 预约订单
 export type TimeSlot = 'morning' | 'afternoon'
 export type TravelMode = 'scenicBus' | 'selfDriving' | 'tourGroup'
-export type VehicleType = 'smallCar' | 'mediumCar' | 'largeCar'
+export type VehicleType = 'wheelMotorcycle' | 'smallCar'
 export type BookingStatus =
-  | 'none'
-  | 'pending_payment'
-  | 'paying'
-  | 'paid'
-  | 'cancelled'
+  | 'pending'
+  | 'confirmed'
   | 'completed'
+  | 'cancelled'
   | 'refunded'
 
 export interface Booking {
@@ -93,10 +91,10 @@ export interface Booking {
 export interface BookingQueryParams {
   page?: number
   pageSize?: number
-  wechatOpenId?: string
   bookingDate?: string
   timeSlot?: TimeSlot
   status?: BookingStatus
+  keyword?: string
 }
 
 export interface Pagination {
@@ -110,6 +108,25 @@ export interface BookingListResponse {
   success: boolean
   data: Booking[]
   pagination: Pagination
+}
+
+// 管理员申请
+export type ApplicationStatus = 'pending' | 'approved' | 'rejected'
+
+export interface Application {
+  id: string
+  applicationId: string
+  name: string
+  phone: string
+  reason: string
+  status: ApplicationStatus
+  rejectionReason?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ApplicationQueryParams {
+  status?: ApplicationStatus
 }
 
 // 通用响应

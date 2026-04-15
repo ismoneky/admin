@@ -7,8 +7,9 @@ export interface LoginParams {
 }
 
 export interface LoginData {
-  token: string
-  user: { id: string; username: string }
+  apiKey: string
+  name: string
+  username: string
 }
 
 export const adminLogin = (params: LoginParams) =>

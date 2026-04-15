@@ -3,14 +3,14 @@ import { message } from 'antd'
 import { useAuthStore } from '../stores/authStore'
 
 const request = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: '/api',
   timeout: 10000,
 })
 
 request.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+  const apiKey = useAuthStore.getState().apiKey
+  if (apiKey) {
+    config.headers['x-admin-key'] = `${apiKey}`
   }
   return config
 })

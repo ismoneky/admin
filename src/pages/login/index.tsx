@@ -15,7 +15,7 @@ export default function LoginPage() {
     try {
       const res = await adminLogin(values)
       if (res.success && res.data) {
-        setAuth(res.data.token, res.data.user.username)
+        setAuth(res.data.apiKey, res.data.name, res.data.username)
         message.success('登录成功')
         navigate('/', { replace: true })
       }

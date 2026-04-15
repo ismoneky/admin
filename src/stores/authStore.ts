@@ -2,19 +2,21 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface AuthState {
-  token: string | null
+  apiKey: string | null
+  name: string | null
   username: string | null
-  setAuth: (token: string, username: string) => void
+  setAuth: (apiKey: string, name: string, username: string) => void
   logout: () => void
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      token: null,
+      apiKey: null,
+      name: null,
       username: null,
-      setAuth: (token, username) => set({ token, username }),
-      logout: () => set({ token: null, username: null }),
+      setAuth: (apiKey, name, username) => set({ apiKey, name, username }),
+      logout: () => set({ apiKey: null, name: null, username: null }),
     }),
     { name: 'admin-auth' }
   )

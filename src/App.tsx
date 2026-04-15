@@ -9,6 +9,7 @@ import LoginPage from './pages/login'
 import AnnouncementsPage from './pages/announcements'
 import SystemConfigPage from './pages/system-config'
 import OrdersPage from './pages/orders'
+import ApplicationsPage from './pages/applications'
 
 dayjs.locale('zh-cn')
 
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="announcements" element={<AnnouncementsPage />} />
               <Route path="system-config" element={<SystemConfigPage />} />
               <Route path="orders" element={<OrdersPage />} />
+              <Route path="applications" element={<ApplicationsPage />} />
             </Route>
           </Routes>
         </BrowserRouter>

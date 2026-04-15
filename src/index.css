@@ -14,3 +14,9 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+
+/* 表头浅灰色 */
+.ant-table-thead > tr > th,
+.ant-table-thead > tr > td {
+  background-color: #f5f5f5 !important;
+}

@@ -5,6 +5,7 @@ import {
   OrderedListOutlined,
   UserOutlined,
   LogoutOutlined,
+  SolutionOutlined,
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
@@ -27,12 +28,17 @@ const menuItems = [
     icon: <OrderedListOutlined />,
     label: '订单查询',
   },
+  {
+    key: '/applications',
+    icon: <SolutionOutlined />,
+    label: '管理员申请',
+  },
 ]
 
 export default function MainLayout() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { username, logout } = useAuthStore()
+  const { name, logout } = useAuthStore()
   const { token: { colorBgContainer, borderRadiusLG } } = theme.useToken()
 
   const handleMenuClick = ({ key }: { key: string }) => {
@@ -101,7 +107,7 @@ export default function MainLayout() {
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Avatar size="small" icon={<UserOutlined />} />
-              <span>{username}</span>
+              <span>{name}</span>
             </div>
           </Dropdown>
         </Header>
@@ -112,7 +118,6 @@ export default function MainLayout() {
               padding: 24,
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
-              minHeight: 'calc(100vh - 64px - 48px)',
             }}
           >
             <Outlet />

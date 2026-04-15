@@ -30,19 +30,16 @@ const TRAVEL_MODE_MAP = {
   tourGroup: '旅游团',
 }
 
-const VEHICLE_TYPE_MAP = {
-  smallCar: '小型车',
-  mediumCar: '中型车',
-  largeCar: '大型车',
+const VEHICLE_TYPE_MAP: Record<string, { label: string; color: string }> = {
+  wheelMotorcycle: { label: '摩托车', color: 'volcano' },
+  smallCar: { label: '小客车', color: 'geekblue' },
 }
 
 const STATUS_MAP: Record<BookingStatus, { label: string; color: string }> = {
-  none: { label: '无状态', color: 'default' },
-  pending_payment: { label: '待支付', color: 'orange' },
-  paying: { label: '支付中', color: 'blue' },
-  paid: { label: '已支付', color: 'green' },
+  pending: { label: '待支付', color: 'orange' },
+  confirmed: { label: '已支付', color: 'blue' },
+  completed: { label: '已完成', color: 'green' },
   cancelled: { label: '已取消', color: 'red' },
-  completed: { label: '已完成', color: 'cyan' },
   refunded: { label: '已退款', color: 'purple' },
 }
 
@@ -53,7 +50,7 @@ export default function OrdersPage() {
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10, total: 0 })
   const [detailVisible, setDetailVisible] = useState(false)
   const [currentRecord, setCurrentRecord] = useState<Booking | null>(null)
-  const [queryParams, setQueryParams] = useState<BookingQueryParams>({ page: 1, pageSize: 10 })
+  const [queryParams, setQueryParams] = useState<BookingQueryParams>({ page: 1, pageSize: 20 })
 
   const fetchData = useCallback(async (params: BookingQueryParams) => {
     setLoading(true)
@@ -85,7 +82,7 @@ export default function OrdersPage() {
     if (values.bookingDate) params.bookingDate = dayjs(values.bookingDate).format('YYYY-MM-DD')
     if (values.timeSlot) params.timeSlot = values.timeSlot
     if (values.status) params.status = values.status
-    if (values.wechatOpenId) params.wechatOpenId = values.wechatOpenId
+    if (values.keyword) params.keyword = values.keyword
     setQueryParams(params)
   }
 
@@ -161,10 +158,13 @@ export default function OrdersPage() {
       render: (v: TimeSlot) => TIME_SLOT_MAP[v] ?? v,
     },
     {
-      title: '出行方式',
-      dataIndex: 'travelMode',
+      title: '车辆类型',
+      dataIndex: 'vehicleType',
       width: 100,
-      render: (v: string) => TRAVEL_MODE_MAP[v as keyof typeof TRAVEL_MODE_MAP] ?? v,
+      render: (v: string) => {
+        const t = VEHICLE_TYPE_MAP[v]
+        return t ? <Tag color={t.color}>{t.label}</Tag> : '-'
+      },
     },
     {
       title: '人数',
@@ -231,8 +231,8 @@ export default function OrdersPage() {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item name="wechatOpenId" label="OpenID">
-          <Input placeholder="微信OpenID" style={{ width: 160 }} allowClear />
+        <Form.Item name="keyword" label="关键字">
+          <Input placeholder="姓名 / 手机号 / 订单号" style={{ width: 200 }} allowClear />
         </Form.Item>
         <Form.Item>
           <Space>
