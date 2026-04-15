@@ -131,7 +131,7 @@ export default function MainLayout() {
         </Content>
         <Footer style={{ textAlign: 'center', padding: '12px 24px', fontSize: 12, color: '#999' }}>
           <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer" style={{ color: '#999' }}>
-            豫ICP备2026013379号
+            豫ICP备2026013379号-1
           </a>
         </Footer>
       </Layout>
