@@ -89,7 +89,7 @@ export default function SystemConfigPage() {
         style={{ maxWidth: 800 }}
         onValuesChange={(changed) => {
           if ('bookingEnabled' in changed) {
-            setBookingEnabled(changed.bookingEnabled)
+            setBookingEnabled(changed.bookingEnabled || false)
           }
         }}
       >

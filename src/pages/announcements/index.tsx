@@ -9,8 +9,7 @@ import {
   Input,
   InputNumber,
   message,
-  Popconfirm,
-  Tag,
+  Popconfirm
 } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'

@@ -1,0 +1,1 @@
+scp -r /Users/zhangzhiwei/Desktop/code/copy/admin/dist/* root@82.157.111.208:/app/admin/
