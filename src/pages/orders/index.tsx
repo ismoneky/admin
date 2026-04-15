@@ -116,7 +116,7 @@ export default function OrdersPage() {
         时间段: TIME_SLOT_MAP[item.timeSlot] ?? item.timeSlot,
         出行方式: TRAVEL_MODE_MAP[item.travelMode as keyof typeof TRAVEL_MODE_MAP] ?? item.travelMode,
         车牌号: item.licensePlate ?? '',
-        车辆类型: item.vehicleType ? (VEHICLE_TYPE_MAP[item.vehicleType] ?? item.vehicleType) : '',
+        车辆类型: item.vehicleType ? (VEHICLE_TYPE_MAP[item.vehicleType]?.label ?? item.vehicleType) : '',
         旅游团名称: item.tourGroupName ?? '',
         旅游团订单号: item.tourOrderNumber ?? '',
         预约人数: item.personCount,
@@ -223,7 +223,7 @@ export default function OrdersPage() {
           </Select>
         </Form.Item>
         <Form.Item name="status" label="订单状态">
-          <Select placeholder="全部" style={{ width: 120 }} allowClear>
+          <Select mode="multiple" placeholder="全部" style={{ minWidth: 160 }} allowClear maxTagCount="responsive">
             {Object.entries(STATUS_MAP).map(([key, val]) => (
               <Select.Option key={key} value={key}>
                 {val.label}
@@ -289,7 +289,9 @@ export default function OrdersPage() {
             )}
             {currentRecord.vehicleType && (
               <Descriptions.Item label="车辆类型">
-                {VEHICLE_TYPE_MAP[currentRecord.vehicleType] ?? currentRecord.vehicleType}
+                {VEHICLE_TYPE_MAP[currentRecord.vehicleType]
+                  ? <Tag color={VEHICLE_TYPE_MAP[currentRecord.vehicleType].color}>{VEHICLE_TYPE_MAP[currentRecord.vehicleType].label}</Tag>
+                  : currentRecord.vehicleType}
               </Descriptions.Item>
             )}
             {currentRecord.tourGroupName && (

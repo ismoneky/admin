@@ -6,11 +6,12 @@ import {
   UserOutlined,
   LogoutOutlined,
   SolutionOutlined,
+  MessageOutlined,
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 
-const { Header, Sider, Content } = Layout
+const { Header, Sider, Content, Footer } = Layout
 
 const menuItems = [
   {
@@ -32,6 +33,11 @@ const menuItems = [
     key: '/applications',
     icon: <SolutionOutlined />,
     label: '管理员申请',
+  },
+  {
+    key: '/feedbacks',
+    icon: <MessageOutlined />,
+    label: '反馈统计',
   },
 ]
 
@@ -123,6 +129,11 @@ export default function MainLayout() {
             <Outlet />
           </div>
         </Content>
+        <Footer style={{ textAlign: 'center', padding: '12px 24px', fontSize: 12, color: '#999' }}>
+          <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer" style={{ color: '#999' }}>
+            豫ICP备2026013379号
+          </a>
+        </Footer>
       </Layout>
     </Layout>
   )

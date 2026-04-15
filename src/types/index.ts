@@ -53,8 +53,8 @@ export interface UpdateSystemConfigDto {
   bookingEnabled?: boolean
   bookingDisabledMessage?: string
   banners?: Banner[]
-  timeSlotLimitJson?: string
-  paymentConfigJson?: string
+  timeSlotLimit: TimeSlotLimit
+  paymentConfig: PaymentConfig
 }
 
 // 预约订单
@@ -93,7 +93,7 @@ export interface BookingQueryParams {
   pageSize?: number
   bookingDate?: string
   timeSlot?: TimeSlot
-  status?: BookingStatus
+  status?: BookingStatus | BookingStatus[]
   keyword?: string
 }
 
@@ -127,6 +127,15 @@ export interface Application {
 
 export interface ApplicationQueryParams {
   status?: ApplicationStatus
+}
+
+// 反馈
+export interface Feedback {
+  feedbackId: string
+  wechatOpenId: string
+  phone: string
+  content: string
+  createdAt: string
 }
 
 // 通用响应

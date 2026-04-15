@@ -138,7 +138,7 @@ export default function AnnouncementsPage() {
     },
     {
       title: '操作',
-      width: 140,
+      width: 180,
       render: (_, record) => (
         <Space>
           <Button
@@ -165,7 +165,7 @@ export default function AnnouncementsPage() {
   ]
 
   return (
-    <>
+    <div className='content'>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <h2 style={{ margin: 0 }}>公告管理</h2>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
@@ -174,6 +174,7 @@ export default function AnnouncementsPage() {
       </div>
 
       <Table
+        className='table'
         rowKey="id"
         columns={columns}
         dataSource={data}
@@ -207,6 +208,6 @@ export default function AnnouncementsPage() {
           </Form.Item>
         </Form>
       </Modal>
-    </>
+    </div>
   )
 }

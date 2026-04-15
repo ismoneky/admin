@@ -58,13 +58,13 @@ export default function SystemConfigPage() {
       const res = await updateSystemConfig({
         bookingEnabled: values.bookingEnabled,
         bookingDisabledMessage: values.bookingDisabledMessage,
-        timeSlotLimitJson: JSON.stringify({
+        timeSlotLimit: {
           morningMaxPeople: values.morningMaxPeople,
           afternoonMaxPeople: values.afternoonMaxPeople,
-        }),
-        paymentConfigJson: JSON.stringify({
+        },
+        paymentConfig: {
           paymentAmount: values.paymentAmount,
-        }),
+        },
       })
       if (res.success) {
         message.success('系统配置更新成功')
