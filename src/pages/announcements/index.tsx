@@ -59,8 +59,8 @@ export default function AnnouncementsPage() {
     setModalOpen(true)
   }
 
-  const handleDelete = async (id: string) => {
-    const res = await deleteAnnouncement(id)
+  const handleDelete = async (announcementId: string) => {
+    const res = await deleteAnnouncement(announcementId)
     if (res.success) {
       message.success('删除成功')
       fetchData()
@@ -68,7 +68,7 @@ export default function AnnouncementsPage() {
   }
 
   const handleToggleActive = async (record: Announcement, checked: boolean) => {
-    const res = await updateAnnouncement(record.id, { isActive: checked })
+    const res = await updateAnnouncement(record.announcementId, { isActive: checked })
     if (res.success) {
       message.success(checked ? '已启用' : '已禁用')
       fetchData()
@@ -80,7 +80,7 @@ export default function AnnouncementsPage() {
     setSubmitting(true)
     try {
       if (editingItem) {
-        const res = await updateAnnouncement(editingItem.id, values)
+        const res = await updateAnnouncement(editingItem.announcementId, values)
         if (res.success) {
           message.success('更新成功')
           setModalOpen(false)
@@ -150,7 +150,7 @@ export default function AnnouncementsPage() {
           </Button>
           <Popconfirm
             title="确认删除该公告？"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => handleDelete(record.announcementId)}
             okText="确认"
             cancelText="取消"
           >

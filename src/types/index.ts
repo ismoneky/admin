@@ -1,6 +1,7 @@
 // 公告
 export interface Announcement {
   id: string
+  announcementId: string
   title: string
   content: string
   isActive: boolean
