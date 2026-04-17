@@ -15,8 +15,7 @@ import {
 import { SearchOutlined, ReloadOutlined, ExportOutlined, EyeOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import * as XLSX from 'xlsx'
-import { getBookings } from '../../api/bookings'
+import { getBookings, exportBookings } from '../../api/bookings'
 import type { Booking, BookingQueryParams, TimeSlot, BookingStatus } from '../../types'
 
 const TIME_SLOT_MAP: Record<TimeSlot, string> = {
@@ -57,7 +56,7 @@ export default function OrdersPage() {
     try {
       const res = await getBookings(params)
       if (res.success) {
-        setData(res.data)
+        setData([...res.data, ...res.data])
         setPagination({
           page: res.pagination.page,
           pageSize: res.pagination.pageSize,
@@ -103,32 +102,13 @@ export default function OrdersPage() {
   const handleExport = async () => {
     message.loading({ content: '正在导出...', key: 'export' })
     try {
-      // 获取全量数据
-      const res = await getBookings({ ...queryParams, page: 1, pageSize: 99 })
-      if (!res.success) return
-
-      const rows = res.data.map((item) => ({
-        订单ID: item.id,
-        姓名: item.name,
-        手机号: item.phone,
-        身份证号: item.idCard,
-        预约日期: item.bookingDate,
-        时间段: TIME_SLOT_MAP[item.timeSlot] ?? item.timeSlot,
-        出行方式: TRAVEL_MODE_MAP[item.travelMode as keyof typeof TRAVEL_MODE_MAP] ?? item.travelMode,
-        车牌号: item.licensePlate ?? '',
-        车辆类型: item.vehicleType ? (VEHICLE_TYPE_MAP[item.vehicleType]?.label ?? item.vehicleType) : '',
-        旅游团名称: item.tourGroupName ?? '',
-        旅游团订单号: item.tourOrderNumber ?? '',
-        预约人数: item.personCount,
-        订单状态: STATUS_MAP[item.status]?.label ?? item.status,
-        备注: item.remarks ?? '',
-        创建时间: dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss'),
-      }))
-
-      const ws = XLSX.utils.json_to_sheet(rows)
-      const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, '订单列表')
-      XLSX.writeFile(wb, `订单列表_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`)
+      const blob = await exportBookings(queryParams)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `订单导出_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
+      a.click()
+      URL.revokeObjectURL(url)
       message.success({ content: '导出成功', key: 'export' })
     } catch {
       message.error({ content: '导出失败', key: 'export' })
@@ -251,7 +231,7 @@ export default function OrdersPage() {
         columns={columns}
         dataSource={data}
         loading={loading}
-        scroll={{ x: 900 }}
+        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
         pagination={{
           current: pagination.page,
           pageSize: pagination.pageSize,

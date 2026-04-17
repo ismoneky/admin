@@ -11,7 +11,7 @@ import {
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 
-const { Header, Sider, Content, Footer } = Layout
+const { Header, Sider, Content } = Layout
 
 const menuItems = [
   {
@@ -96,7 +96,7 @@ export default function MainLayout() {
         />
       </Sider>
 
-      <Layout style={{ marginLeft: 200 }}>
+      <Layout style={{ marginLeft: 200, height: '100vh', display: 'flex', flexDirection: 'column' }}>
         <Header
           style={{
             padding: '0 24px',
@@ -118,7 +118,7 @@ export default function MainLayout() {
           </Dropdown>
         </Header>
 
-        <Content style={{ margin: 24 }}>
+        <Content style={{ margin: '24px 24px 60px' }}>
           <div
             style={{
               padding: 24,
@@ -129,11 +129,6 @@ export default function MainLayout() {
             <Outlet />
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center', padding: '12px 24px', fontSize: 12, color: '#999' }}>
-          <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer" style={{ color: '#999' }}>
-            豫ICP备2026013379号-1
-          </a>
-        </Footer>
       </Layout>
     </Layout>
   )
