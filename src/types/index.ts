@@ -78,6 +78,7 @@ export interface Booking {
   bookingDate: string
   timeSlot: TimeSlot
   travelMode: TravelMode
+  outTradeNo: string
   licensePlate?: string
   vehicleType?: VehicleType
   tourGroupName?: string

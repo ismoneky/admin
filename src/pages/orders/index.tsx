@@ -104,7 +104,7 @@ export default function OrdersPage() {
     message.loading({ content: '正在导出...', key: 'export' })
     try {
       // 获取全量数据
-      const res = await getBookings({ ...queryParams, page: 1, pageSize: 9999 })
+      const res = await getBookings({ ...queryParams, page: 1, pageSize: 99 })
       if (!res.success) return
 
       const rows = res.data.map((item) => ({
@@ -272,7 +272,7 @@ export default function OrdersPage() {
       >
         {currentRecord && (
           <Descriptions bordered column={2} size="small" style={{ marginTop: 16 }}>
-            <Descriptions.Item label="订单ID" span={2}>{currentRecord.id}</Descriptions.Item>
+            <Descriptions.Item label="商户订单ID" span={2}>{currentRecord.outTradeNo}</Descriptions.Item>
             <Descriptions.Item label="姓名">{currentRecord.name}</Descriptions.Item>
             <Descriptions.Item label="手机号">{currentRecord.phone}</Descriptions.Item>
             <Descriptions.Item label="身份证号" span={2}>{currentRecord.idCard}</Descriptions.Item>
