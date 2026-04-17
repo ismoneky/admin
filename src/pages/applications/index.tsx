@@ -170,6 +170,7 @@ export default function ApplicationsPage() {
         dataSource={list}
         loading={loading}
         pagination={false}
+        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
       />
 
       <Modal

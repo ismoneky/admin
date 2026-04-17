@@ -80,6 +80,7 @@ export default function FeedbacksPage() {
         columns={columns}
         dataSource={filtered}
         loading={loading}
+        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
         pagination={{ pageSize: 20, showTotal: (total) => `共 ${total} 条` }}
       />
 

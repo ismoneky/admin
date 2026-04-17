@@ -178,6 +178,7 @@ export default function AnnouncementsPage() {
         columns={columns}
         dataSource={data}
         loading={loading}
+        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
         pagination={{ pageSize: 10, showTotal: (t) => `共 ${t} 条` }}
       />
 
