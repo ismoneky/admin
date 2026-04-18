@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "engines": {
+        "node": "20.19.0"
+    },
   "dependencies": {
     "@ant-design/icons": "^6.1.1",
     "antd": "^6.3.5",
