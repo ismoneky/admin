@@ -15,7 +15,7 @@ import {
 import { SearchOutlined, ReloadOutlined, ExportOutlined, EyeOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import { getBookings, exportBookings } from '../../api/bookings'
+import { getBookings } from '../../api/bookings'
 import type { Booking, BookingQueryParams, TimeSlot, BookingStatus } from '../../types'
 
 const TIME_SLOT_MAP: Record<TimeSlot, string> = {
