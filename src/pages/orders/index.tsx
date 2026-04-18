@@ -101,18 +101,19 @@ export default function OrdersPage() {
 
   const handleExport = async () => {
     message.loading({ content: '正在导出...', key: 'export' })
-    try {
-      const blob = await exportBookings(queryParams)
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `订单导出_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
-      a.click()
-      URL.revokeObjectURL(url)
-      message.success({ content: '导出成功', key: 'export' })
-    } catch {
-      message.error({ content: '导出失败', key: 'export' })
-    }
+    // try {
+    //   const data = await exportBookings()
+    //   const blob = new Blob([data])
+    //   const url = URL.createObjectURL(blob)
+    //   const a = document.createElement('a')
+    //   a.href = url
+    //   a.download = `订单导出_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
+    //   a.click()
+    //   URL.revokeObjectURL(url)
+    //   message.success({ content: '导出成功', key: 'export' })
+    // } catch {
+    //   message.error({ content: '导出失败', key: 'export' })
+    // }
   }
 
   const columns: ColumnsType<Booking> = [
