@@ -36,7 +36,6 @@ export interface PaymentConfig {
 
 export interface Banner {
   imageUrl: string
-  linkUrl?: string
 }
 
 export interface SystemConfig {
@@ -44,6 +43,7 @@ export interface SystemConfig {
   bookingEnabled: boolean
   bookingDisabledMessage: string
   banners: Banner[]
+  bannersJson: string
   timeSlotLimitJson: string
   paymentConfigJson: string
   createdAt: string
