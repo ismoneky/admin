@@ -69,9 +69,16 @@ export type BookingStatus =
   | 'cancelled'
   | 'refunded'
 
+export interface Passenger {
+  name: string
+  phone: string
+  idCard: string
+}
+
 export interface Booking {
   id: string
   wechatOpenId: string
+  passengers?: string | Passenger[]
   name: string
   phone: string
   idCard: string

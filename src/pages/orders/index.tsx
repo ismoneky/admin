@@ -15,8 +15,14 @@ import {
 import { SearchOutlined, ReloadOutlined, ExportOutlined, EyeOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
-import { getBookings } from '../../api/bookings'
-import type { Booking, BookingQueryParams, TimeSlot, BookingStatus } from '../../types'
+import { getBookings, exportBookings } from '../../api/bookings'
+import type { Booking, BookingQueryParams, TimeSlot, BookingStatus, Passenger } from '../../types'
+
+function parsePassengers(passengers: string | Passenger[] | undefined): Passenger[] {
+  if (!passengers) return []
+  if (Array.isArray(passengers)) return passengers
+  try { return JSON.parse(passengers) } catch { return [] }
+}
 
 const TIME_SLOT_MAP: Record<TimeSlot, string> = {
   morning: '上午',
@@ -101,19 +107,19 @@ export default function OrdersPage() {
 
   const handleExport = async () => {
     message.loading({ content: '正在导出...', key: 'export' })
-    // try {
-    //   const data = await exportBookings()
-    //   const blob = new Blob([data])
-    //   const url = URL.createObjectURL(blob)
-    //   const a = document.createElement('a')
-    //   a.href = url
-    //   a.download = `订单导出_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
-    //   a.click()
-    //   URL.revokeObjectURL(url)
-    //   message.success({ content: '导出成功', key: 'export' })
-    // } catch {
-    //   message.error({ content: '导出失败', key: 'export' })
-    // }
+    try {
+      const { page: _page, pageSize: _pageSize, ...exportParams } = queryParams
+      const blob = await exportBookings(exportParams)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `订单导出_${dayjs().format('YYYYMMDD_HHmmss')}.xlsx`
+      a.click()
+      URL.revokeObjectURL(url)
+      message.success({ content: '导出成功', key: 'export' })
+    } catch {
+      message.error({ content: '导出失败', key: 'export' })
+    }
   }
 
   const columns: ColumnsType<Booking> = [
@@ -265,6 +271,24 @@ export default function OrdersPage() {
               {TRAVEL_MODE_MAP[currentRecord.travelMode as keyof typeof TRAVEL_MODE_MAP] ?? currentRecord.travelMode}
             </Descriptions.Item>
             <Descriptions.Item label="预约人数">{currentRecord.personCount} 人</Descriptions.Item>
+            {(() => {
+              const passengers = parsePassengers(currentRecord.passengers)
+              if (passengers.length === 0) return null
+              return (
+                <Descriptions.Item label="出行人员" span={2}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {passengers.map((p, i) => (
+                      <div key={i} style={{ padding: '8px 12px', background: '#f7f8fd', borderRadius: 6, fontSize: 13 }}>
+                        <span style={{ fontWeight: 600 }}>{i === 0 ? `联系人` : `第${i + 1}位`}：</span>
+                        <span>{p.name}</span>
+                        <span style={{ marginLeft: 16, color: '#666' }}>{p.phone}</span>
+                        <span style={{ marginLeft: 16, color: '#999' }}>{p.idCard}</span>
+                      </div>
+                    ))}
+                  </div>
+                </Descriptions.Item>
+              )
+            })()}
             {currentRecord.licensePlate && (
               <Descriptions.Item label="车牌号">{currentRecord.licensePlate}</Descriptions.Item>
             )}
