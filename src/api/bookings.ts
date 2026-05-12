@@ -10,8 +10,7 @@ export const getBookings = (params?: BookingQueryParams) =>
   request.get<never, BookingListResponse>("/admin/bookings", { params });
 
 export const exportBookings = (params?: BookingQueryParams): Promise<Blob> =>
-  request.get("/admin/bookings/export", { params, responseType: "blob" })
-    .then(res => res.data);
+  request.get("/admin/bookings/export", { params, responseType: "blob" });
 
 export const getBookingById = (bookingId: string) =>
   request.get<never, ApiResponse<Booking>>(`/bookings/${bookingId}`);

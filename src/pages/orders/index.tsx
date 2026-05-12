@@ -110,6 +110,7 @@ export default function OrdersPage() {
     try {
       const { page: _page, pageSize: _pageSize, ...exportParams } = queryParams
       const blob = await exportBookings(exportParams); // 现在类型是 Blob
+      console.log(blob)
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -117,8 +118,9 @@ export default function OrdersPage() {
       a.click()
       URL.revokeObjectURL(url)
       message.success({ content: '导出成功', key: 'export' })
-    } catch {
-      message.error({ content: '导出失败', key: 'export' })
+    } catch(error) {
+        console.log(error)
+    //   message.error({ content: '导出失败', key: 'export' })
     }
   }
 
