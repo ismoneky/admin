@@ -109,7 +109,8 @@ export default function OrdersPage() {
     message.loading({ content: '正在导出...', key: 'export' })
     try {
       const { page: _page, pageSize: _pageSize, ...exportParams } = queryParams
-      const blob = await exportBookings(exportParams)
+      const response = await exportBookings(exportParams)
+      const blob = response.data
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
