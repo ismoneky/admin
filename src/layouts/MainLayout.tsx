@@ -7,6 +7,7 @@ import {
   LogoutOutlined,
   SolutionOutlined,
   MessageOutlined,
+  CrownOutlined,
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
@@ -38,6 +39,11 @@ const menuItems = [
     key: '/feedbacks',
     icon: <MessageOutlined />,
     label: '反馈统计',
+  },
+  {
+    key: '/members',
+    icon: <CrownOutlined />,
+    label: '月卡会员',
   },
 ]
 

@@ -48,6 +48,8 @@ export default function SystemConfigPage() {
           morningMaxPeople: timeSlotLimit?.morningMaxPeople ?? 100,
           afternoonMaxPeople: timeSlotLimit?.afternoonMaxPeople ?? 100,
           paymentAmount: paymentConfig?.paymentAmount ?? 0,
+          freeQuotaEnabled: paymentConfig?.freeQuotaEnabled ?? false,
+          freeQuotaLimit: paymentConfig?.freeQuotaLimit ?? 100,
         })
       }
     } finally {
@@ -61,7 +63,7 @@ export default function SystemConfigPage() {
 
   const saveBanners = async (newBanners: Banner[]) => {
     const values = form.getFieldsValue()
-    await updateSystemConfig({
+      await updateSystemConfig({
       bookingEnabled: values.bookingEnabled,
       bookingDisabledMessage: values.bookingDisabledMessage,
       banners: newBanners,
@@ -69,7 +71,11 @@ export default function SystemConfigPage() {
         morningMaxPeople: values.morningMaxPeople,
         afternoonMaxPeople: values.afternoonMaxPeople,
       },
-      paymentConfig: { paymentAmount: values.paymentAmount },
+      paymentConfig: {
+        paymentAmount: values.paymentAmount,
+        freeQuotaEnabled: values.freeQuotaEnabled,
+        freeQuotaLimit: values.freeQuotaLimit,
+      },
     })
   }
 
@@ -79,6 +85,8 @@ export default function SystemConfigPage() {
     morningMaxPeople: number
     afternoonMaxPeople: number
     paymentAmount: number
+    freeQuotaEnabled: boolean
+    freeQuotaLimit: number
   }) => {
     setSubmitting(true)
     try {
@@ -90,7 +98,11 @@ export default function SystemConfigPage() {
           morningMaxPeople: values.morningMaxPeople,
           afternoonMaxPeople: values.afternoonMaxPeople,
         },
-        paymentConfig: { paymentAmount: values.paymentAmount },
+        paymentConfig: {
+          paymentAmount: values.paymentAmount,
+          freeQuotaEnabled: values.freeQuotaEnabled,
+          freeQuotaLimit: values.freeQuotaLimit,
+        },
       })
       if (res.success) {
         message.success('系统配置更新成功')
@@ -234,8 +246,25 @@ export default function SystemConfigPage() {
         </Card>
 
         <Card title="支付配置" style={{ marginBottom: 12, width: '100%' }} size="small">
-          <Form.Item name="paymentAmount" label="预约支付金额" rules={[{ required: true, message: '请输入支付金额' }]} style={{ marginBottom: 0 }}>
+          <Form.Item name="paymentAmount" label="预约支付金额" rules={[{ required: true, message: '请输入支付金额' }]} style={{ marginBottom: 12 }}>
             <InputNumber min={0} precision={0} style={{ width: 160 }} addonAfter="分" />
+          </Form.Item>
+          <Form.Item name="freeQuotaEnabled" label="每日前N名免费" valuePropName="checked" style={{ marginBottom: 12 }}>
+            <Switch checkedChildren="开启" unCheckedChildren="关闭" />
+          </Form.Item>
+          <Form.Item noStyle shouldUpdate={(prev, cur) => prev.freeQuotaEnabled !== cur.freeQuotaEnabled}>
+            {({ getFieldValue }) =>
+              getFieldValue('freeQuotaEnabled') ? (
+                <Form.Item
+                  name="freeQuotaLimit"
+                  label="每日免费名额"
+                  rules={[{ required: true, message: '请输入免费名额' }]}
+                  style={{ marginBottom: 0 }}
+                >
+                  <InputNumber min={1} precision={0} style={{ width: 160 }} addonAfter="人" />
+                </Form.Item>
+              ) : null
+            }
           </Form.Item>
         </Card>
       </Form>

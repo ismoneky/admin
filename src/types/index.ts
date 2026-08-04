@@ -32,6 +32,8 @@ export interface TimeSlotLimit {
 
 export interface PaymentConfig {
   paymentAmount: number
+  freeQuotaEnabled?: boolean
+  freeQuotaLimit?: number
 }
 
 export interface Banner {
@@ -93,6 +95,8 @@ export interface Booking {
   personCount: number
   remarks?: string
   status: BookingStatus
+  isFree?: boolean
+  freeReason?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -116,6 +120,56 @@ export interface Pagination {
 export interface BookingListResponse {
   success: boolean
   data: Booking[]
+  pagination: Pagination
+}
+
+// 月卡会员
+export type MemberStatus = 'active' | 'expired' | 'disabled'
+
+export interface Member {
+  id: number
+  memberId: string
+  wechatOpenId: string
+  name: string
+  phone: string
+  idCard: string
+  status: MemberStatus
+  startDate: string
+  endDate: string
+  remarks: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateMemberDto {
+  phone: string
+  name: string
+  idCard: string
+  startDate: string
+  endDate: string
+  remarks?: string
+}
+
+export interface UpdateMemberDto {
+  name?: string
+  phone?: string
+  idCard?: string
+  startDate?: string
+  endDate?: string
+  status?: MemberStatus
+  remarks?: string
+}
+
+export interface MemberQueryParams {
+  keyword?: string
+  status?: MemberStatus
+  page?: number
+  pageSize?: number
+}
+
+export interface MemberListResponse {
+  success: boolean
+  data: Member[]
   pagination: Pagination
 }
 

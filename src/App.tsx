@@ -11,6 +11,7 @@ import SystemConfigPage from "./pages/system-config";
 import OrdersPage from "./pages/orders";
 import ApplicationsPage from "./pages/applications";
 import FeedbacksPage from "./pages/feedbacks";
+import MembersPage from "./pages/members";
 
 dayjs.locale("zh-cn");
 
@@ -59,6 +60,7 @@ export default function App() {
               <Route path="orders" element={<OrdersPage />} />
               <Route path="applications" element={<ApplicationsPage />} />
               <Route path="feedbacks" element={<FeedbacksPage />} />
+              <Route path="members" element={<MembersPage />} />
             </Route>
           </Routes>
           <Beian />
