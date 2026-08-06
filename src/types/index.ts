@@ -97,6 +97,7 @@ export interface Booking {
   status: BookingStatus
   isFree?: boolean
   freeReason?: string | null
+  amount?: number | null
   createdAt: string
   updatedAt: string
 }
@@ -105,6 +106,8 @@ export interface BookingQueryParams {
   page?: number
   pageSize?: number
   bookingDate?: string
+  createdStart?: string
+  createdEnd?: string
   timeSlot?: TimeSlot
   status?: BookingStatus | BookingStatus[]
   keyword?: string

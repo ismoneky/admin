@@ -29,6 +29,12 @@ const TIME_SLOT_MAP: Record<TimeSlot, string> = {
   afternoon: '下午',
 }
 
+/** 免费来源映射（freeReason） */
+const FREE_REASON_MAP: Record<string, { label: string; color: string }> = {
+  member: { label: '会员免费', color: 'gold' },
+  dailyQuota: { label: '每日免费', color: 'cyan' },
+}
+
 const TRAVEL_MODE_MAP = {
   scenicBus: '景区大巴',
   selfDriving: '自驾',
@@ -55,14 +61,14 @@ export default function OrdersPage() {
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10, total: 0 })
   const [detailVisible, setDetailVisible] = useState(false)
   const [currentRecord, setCurrentRecord] = useState<Booking | null>(null)
-  const [queryParams, setQueryParams] = useState<BookingQueryParams>({ page: 1, pageSize: 20 })
+  const [queryParams, setQueryParams] = useState<BookingQueryParams>({ page: 1, pageSize: 10 })
 
   const fetchData = useCallback(async (params: BookingQueryParams) => {
     setLoading(true)
     try {
       const res = await getBookings(params)
       if (res.success) {
-        setData([...res.data, ...res.data])
+        setData(res.data)
         setPagination({
           page: res.pagination.page,
           pageSize: res.pagination.pageSize,
@@ -85,7 +91,10 @@ export default function OrdersPage() {
       pageSize: pagination.pageSize,
     }
     if (values.bookingDate) params.bookingDate = dayjs(values.bookingDate).format('YYYY-MM-DD')
-    if (values.timeSlot) params.timeSlot = values.timeSlot
+    if (values.createdRange && values.createdRange.length === 2) {
+      params.createdStart = values.createdRange[0].format('YYYY-MM-DD')
+      params.createdEnd = values.createdRange[1].format('YYYY-MM-DD')
+    }
     if (values.status) params.status = values.status
     if (values.keyword) params.keyword = values.keyword
     setQueryParams(params)
@@ -161,6 +170,26 @@ export default function OrdersPage() {
       width: 70,
     },
     {
+      title: '是否免费',
+      dataIndex: 'isFree',
+      width: 100,
+      render: (isFree: boolean | undefined, record: Booking) => {
+        if (!isFree) return <span style={{ color: '#999' }}>收费</span>
+        const r = record.freeReason ? FREE_REASON_MAP[record.freeReason] : undefined
+        return r ? <Tag color={r.color}>{r.label}</Tag> : <Tag color="green">免费</Tag>
+      },
+    },
+    {
+      title: '金额',
+      dataIndex: 'amount',
+      width: 90,
+      render: (amount: number | null | undefined, record: Booking) => {
+        if (record.isFree) return <span style={{ color: '#52c41a' }}>¥0.00</span>
+        if (amount == null) return '-'
+        return `¥${(amount / 100).toFixed(2)}`
+      },
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       width: 100,
@@ -205,11 +234,8 @@ export default function OrdersPage() {
         <Form.Item name="bookingDate" label="预约日期">
           <DatePicker placeholder="选择日期" />
         </Form.Item>
-        <Form.Item name="timeSlot" label="时间段">
-          <Select placeholder="全部" style={{ width: 100 }} allowClear>
-            <Select.Option value="morning">上午</Select.Option>
-            <Select.Option value="afternoon">下午</Select.Option>
-          </Select>
+        <Form.Item name="createdRange" label="创建日期">
+          <DatePicker.RangePicker placeholder={['开始', '结束']} style={{ width: 240 }} />
         </Form.Item>
         <Form.Item name="status" label="订单状态">
           <Select mode="multiple" placeholder="全部" style={{ minWidth: 160 }} allowClear maxTagCount="responsive">
@@ -313,6 +339,18 @@ export default function OrdersPage() {
                   {STATUS_MAP[currentRecord.status].label}
                 </Tag>
               ) : currentRecord.status}
+            </Descriptions.Item>
+            <Descriptions.Item label="是否免费">
+              {currentRecord.isFree
+                ? (currentRecord.freeReason && FREE_REASON_MAP[currentRecord.freeReason]
+                    ? <Tag color={FREE_REASON_MAP[currentRecord.freeReason].color}>{FREE_REASON_MAP[currentRecord.freeReason].label}</Tag>
+                    : <Tag color="green">免费</Tag>)
+                : <span style={{ color: '#999' }}>收费</span>}
+            </Descriptions.Item>
+            <Descriptions.Item label="金额">
+              {currentRecord.isFree
+                ? <span style={{ color: '#52c41a' }}>¥0.00</span>
+                : (currentRecord.amount != null ? `¥${(currentRecord.amount / 100).toFixed(2)}` : '-')}
             </Descriptions.Item>
             <Descriptions.Item label="微信OpenID">{currentRecord.wechatOpenId}</Descriptions.Item>
             {currentRecord.remarks && (
