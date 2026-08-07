@@ -10,9 +10,12 @@ import {
   DatePicker,
   Tag,
   Popconfirm,
+  Card,
+  Row,
+  Col,
   message,
 } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, CrownOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import type {
@@ -102,6 +105,7 @@ export default function MembersPage() {
     form.resetFields()
     form.setFieldsValue({
       dateRange: [dayjs(), dayjs().add(30, 'day')],
+      licensePlates: [],
     })
     setModalOpen(true)
   }
@@ -112,6 +116,9 @@ export default function MembersPage() {
       phone: record.phone,
       name: record.name,
       idCard: record.idCard,
+      licensePlates: record.licensePlates
+        ? record.licensePlates.split(';').map((s) => s.trim()).filter(Boolean)
+        : [],
       dateRange: [dayjs(record.startDate), dayjs(record.endDate)],
       remarks: record.remarks,
       status: record.status,
@@ -165,6 +172,7 @@ export default function MembersPage() {
           name: values.name,
           phone: values.phone,
           idCard: values.idCard,
+          licensePlates: (values.licensePlates || []).map((p: string) => p.toUpperCase().trim()).filter(Boolean),
           startDate,
           endDate,
           remarks: values.remarks || '',
@@ -184,6 +192,7 @@ export default function MembersPage() {
           phone: values.phone,
           name: values.name,
           idCard: values.idCard,
+          licensePlates: (values.licensePlates || []).map((p: string) => p.toUpperCase().trim()).filter(Boolean),
           startDate,
           endDate,
           remarks: values.remarks || '',
@@ -225,6 +234,17 @@ export default function MembersPage() {
       render: (idCard: string) => {
         if (!idCard || idCard.length < 8) return idCard
         return `${idCard.slice(0, 4)}***${idCard.slice(-4)}`
+      },
+    },
+    {
+      title: '车牌号',
+      dataIndex: 'licensePlates',
+      width: 200,
+      ellipsis: true,
+      render: (val?: string) => {
+        if (!val) return '-'
+        const list = val.split(';').map((s) => s.trim()).filter(Boolean)
+        return list.length ? list.map((p) => <Tag key={p}>{p}</Tag>) : '-'
       },
     },
     {
@@ -310,51 +330,63 @@ export default function MembersPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h2 style={{ margin: 0 }}>月卡会员管理</h2>
+      {/* 页头 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Space align="center" size={12}>
+          <CrownOutlined style={{ fontSize: 24, color: '#faad14' }} />
+          <h2 style={{ margin: 0 }}>月卡会员管理</h2>
+          <Tag color="orange" style={{ marginLeft: 4 }}>摩托车专用</Tag>
+        </Space>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
           新增会员
         </Button>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-        <Input
-          placeholder="搜索姓名/手机号/身份证号"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          onPressEnter={handleSearch}
-          style={{ width: 260 }}
-          prefix={<SearchOutlined />}
-          allowClear
-        />
-        <Select
-          value={statusFilter}
-          onChange={(val) => setStatusFilter(val)}
-          options={statusOptions}
-          style={{ width: 120 }}
-        />
-        <Button type="primary" onClick={handleSearch}>
-          查询
-        </Button>
-      </div>
+      {/* 搜索栏 */}
+      <Card size="small" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          <Input
+            placeholder="搜索姓名/手机号/身份证号/车牌号"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onPressEnter={handleSearch}
+            style={{ width: 300 }}
+            prefix={<SearchOutlined />}
+            allowClear
+          />
+          <Select
+            value={statusFilter}
+            onChange={(val) => setStatusFilter(val)}
+            options={statusOptions}
+            style={{ width: 120 }}
+          />
+          <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+            查询
+          </Button>
+        </div>
+      </Card>
 
-      <Table
-        rowKey="id"
-        columns={columns}
-        dataSource={data}
-        loading={loading}
-        scroll={{ x: 1200, y: 'calc(100vh - 430px)' }}
-        pagination={{
-          current: pagination.page,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showTotal: (t) => `共 ${t} 条`,
-          showSizeChanger: true,
-          onChange: (page, pageSize) =>
-            setPagination((prev) => ({ ...prev, page, pageSize })),
-        }}
-      />
+      {/* 表格 */}
+      <Card styles={{ body: { padding: 0 } }}>
+        <Table
+          rowKey="id"
+          columns={columns}
+          dataSource={data}
+          loading={loading}
+          scroll={{ x: 1400, y: 'calc(100vh - 360px)' }}
+          pagination={{
+            current: pagination.page,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showTotal: (t) => `共 ${t} 条`,
+            showSizeChanger: true,
+            onChange: (page, pageSize) =>
+              setPagination((prev) => ({ ...prev, page, pageSize })),
+          }}
+        />
+      </Card>
 
+      {/* 新增/编辑弹窗 */}
       <Modal
         title={editingItem ? '编辑月卡会员' : '新增月卡会员'}
         open={modalOpen}
@@ -363,31 +395,37 @@ export default function MembersPage() {
         confirmLoading={submitting}
         okText={editingItem ? '保存' : '确认创建'}
         cancelText="取消"
-        width={520}
+        width={620}
         destroyOnClose
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item
-            name="phone"
-            label="手机号"
-            rules={[
-              { required: true, message: '请输入手机号' },
-              { pattern: /^1\d{10}$/, message: '请输入正确的手机号' },
-            ]}
-            extra={!editingItem ? '⚠️ 手机号必须为已在小程序注册的用户' : undefined}
-          >
-            <Input placeholder="请输入手机号" maxLength={11} />
-          </Form.Item>
-          <Form.Item
-            name="name"
-            label="姓名"
-            rules={[{ required: true, message: '请输入姓名' }]}
-          >
-            <Input placeholder="请输入姓名" />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                name="name"
+                label="姓名"
+                rules={[{ required: true, message: '请输入姓名' }]}
+              >
+                <Input placeholder="请输入姓名" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name="phone"
+                label={<>手机号 <span style={{ fontSize: 12, color: '#999' }}>仅展示</span></>}
+                rules={[
+                  { required: true, message: '请输入手机号' },
+                  { pattern: /^1\d{10}$/, message: '请输入正确的手机号' },
+                ]}
+              >
+                <Input placeholder="请输入手机号" maxLength={11} />
+              </Form.Item>
+            </Col>
+          </Row>
+
           <Form.Item
             name="idCard"
-            label="身份证号"
+            label={<>身份证号 <span style={{ fontSize: 12, color: '#999' }}>唯一，凭此匹配</span></>}
             rules={[
               { required: true, message: '请输入身份证号' },
               { pattern: /^\d{17}[\dXx]$/, message: '请输入正确的身份证号' },
@@ -395,6 +433,33 @@ export default function MembersPage() {
           >
             <Input placeholder="请输入身份证号" maxLength={18} />
           </Form.Item>
+
+          <Form.Item
+            name="licensePlates"
+            label={<>车牌号 <span style={{ fontSize: 12, color: '#999' }}>回车添加，可多个</span></>}
+            required
+            rules={[
+              {
+                validator: (_, value: string[]) => {
+                  const list = (value || []).map((p) => (p || '').toUpperCase().trim()).filter(Boolean)
+                  if (list.length === 0) return Promise.reject('请至少添加一个车牌号')
+                  const re = /^[京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领][A-Z][A-HJ-NP-Z0-9]{4,5}[A-HJ-NP-Z0-9挂学警港澳]$/
+                  const bad = list.find((p) => !re.test(p))
+                  return bad ? Promise.reject(`车牌号格式不正确：${bad}`) : Promise.resolve()
+                },
+              },
+            ]}
+          >
+            <Select
+              mode="tags"
+              placeholder="如：京A12345（输完按回车）"
+              tokenSeparators={[',', ';']}
+              style={{ width: '100%' }}
+              open={false}
+              suffixIcon={<span style={{ color: '#999', fontSize: 12 }}>回车添加</span>}
+            />
+          </Form.Item>
+
           <Form.Item
             name="dateRange"
             label="有效期"

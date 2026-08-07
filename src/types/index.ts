@@ -136,6 +136,8 @@ export interface Member {
   name: string
   phone: string
   idCard: string
+  /** 车牌号列表，后端分号分隔字符串（如 京A12345;京B67890），前端展示时 split */
+  licensePlates: string
   status: MemberStatus
   startDate: string
   endDate: string
@@ -148,6 +150,7 @@ export interface CreateMemberDto {
   phone: string
   name: string
   idCard: string
+  licensePlates: string[]
   startDate: string
   endDate: string
   remarks?: string
@@ -157,6 +160,7 @@ export interface UpdateMemberDto {
   name?: string
   phone?: string
   idCard?: string
+  licensePlates?: string[]
   startDate?: string
   endDate?: string
   status?: MemberStatus
