@@ -76,7 +76,7 @@ export default function SystemConfigPage() {
       banners: newBanners,
       timeSlotLimit: {
         morningMaxPeople: values.morningMaxPeople,
-        afternoonMaxPeople: values.afternoonMaxPeople,
+        afternoonMaxPeople: 0,
       },
       paymentConfig: {
         paymentAmount: values.paymentAmount,
@@ -109,7 +109,7 @@ export default function SystemConfigPage() {
         banners,
         timeSlotLimit: {
           morningMaxPeople: values.morningMaxPeople,
-          afternoonMaxPeople: values.afternoonMaxPeople,
+          afternoonMaxPeople: 0,
         },
         paymentConfig: {
           paymentAmount: values.paymentAmount,
