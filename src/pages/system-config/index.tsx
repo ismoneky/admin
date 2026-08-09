@@ -16,7 +16,7 @@ import {
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { getSystemConfig, updateSystemConfig } from '../../api/systemConfig'
-import type { SystemConfig, TimeSlotLimit, PaymentConfig, Banner } from '../../types'
+import type { SystemConfig, TimeSlotLimit, PaymentConfig, Banner, NoticeConfig } from '../../types'
 
 const { TextArea } = Input
 
@@ -26,6 +26,7 @@ export default function SystemConfigPage() {
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [bookingEnabled, setBookingEnabled] = useState(true)
+  const [noticeEnabled, setNoticeEnabled] = useState(true)
   const [banners, setBanners] = useState<Banner[]>([])
   const [bannerModalVisible, setBannerModalVisible] = useState(false)
   const [editingBannerIndex, setEditingBannerIndex] = useState<number | null>(null)
@@ -39,8 +40,12 @@ export default function SystemConfigPage() {
         const config: SystemConfig = res.data
         const timeSlotLimit: TimeSlotLimit = JSON.parse(config.timeSlotLimitJson)
         const paymentConfig: PaymentConfig = JSON.parse(config.paymentConfigJson)
+        const noticeConfig: NoticeConfig = JSON.parse(
+          config.noticeConfigJson || '{"enabled":true,"content":""}',
+        )
         const bannerList: Banner[] = JSON.parse(config.bannersJson || '[]')
         setBookingEnabled(config.bookingEnabled)
+        setNoticeEnabled(noticeConfig?.enabled ?? true)
         setBanners(bannerList)
         form.setFieldsValue({
           bookingEnabled: config.bookingEnabled,
@@ -50,6 +55,8 @@ export default function SystemConfigPage() {
           paymentAmount: paymentConfig?.paymentAmount ?? 0,
           freeQuotaEnabled: paymentConfig?.freeQuotaEnabled ?? false,
           freeQuotaLimit: paymentConfig?.freeQuotaLimit ?? 100,
+          noticeEnabled: noticeConfig?.enabled ?? true,
+          noticeContent: noticeConfig?.content ?? '',
         })
       }
     } finally {
@@ -76,6 +83,10 @@ export default function SystemConfigPage() {
         freeQuotaEnabled: values.freeQuotaEnabled,
         freeQuotaLimit: values.freeQuotaLimit,
       },
+      noticeConfig: {
+        enabled: values.noticeEnabled,
+        content: values.noticeContent,
+      },
     })
   }
 
@@ -87,6 +98,8 @@ export default function SystemConfigPage() {
     paymentAmount: number
     freeQuotaEnabled: boolean
     freeQuotaLimit: number
+    noticeEnabled: boolean
+    noticeContent: string
   }) => {
     setSubmitting(true)
     try {
@@ -102,6 +115,10 @@ export default function SystemConfigPage() {
           paymentAmount: values.paymentAmount,
           freeQuotaEnabled: values.freeQuotaEnabled,
           freeQuotaLimit: values.freeQuotaLimit,
+        },
+        noticeConfig: {
+          enabled: values.noticeEnabled,
+          content: values.noticeContent,
         },
       })
       if (res.success) {
@@ -218,6 +235,7 @@ export default function SystemConfigPage() {
         style={{ maxWidth: 800 }}
         onValuesChange={(changed) => {
           if ('bookingEnabled' in changed) setBookingEnabled(changed.bookingEnabled || false)
+          if ('noticeEnabled' in changed) setNoticeEnabled(changed.noticeEnabled || false)
         }}
       >
         <Card title="预约配置" style={{ marginBottom: 12, width: '100%' }} size="small">
@@ -236,11 +254,8 @@ export default function SystemConfigPage() {
           )}
         </Card>
 
-        <Card title="时间段人数限制" style={{ marginBottom: 12, width: '100%' }} size="small">
-          <Form.Item name="morningMaxPeople" label="上午最大人数" rules={[{ required: true, message: '请输入' }]} style={{ marginBottom: 12 }}>
-            <InputNumber min={1} style={{ width: 160 }} addonAfter="人" />
-          </Form.Item>
-          <Form.Item name="afternoonMaxPeople" label="下午最大人数" rules={[{ required: true, message: '请输入' }]} style={{ marginBottom: 0 }}>
+        <Card title="时间段预约限制" style={{ marginBottom: 12, width: '100%' }} size="small">
+          <Form.Item name="morningMaxPeople" label="最大预约单量" rules={[{ required: true, message: '请输入' }]} style={{ marginBottom: 12 }}>
             <InputNumber min={1} style={{ width: 160 }} addonAfter="人" />
           </Form.Item>
         </Card>
@@ -266,6 +281,27 @@ export default function SystemConfigPage() {
               ) : null
             }
           </Form.Item>
+        </Card>
+
+        <Card title="温馨提示配置" style={{ marginBottom: 12, width: '100%' }} size="small">
+          <Form.Item
+            name="noticeEnabled"
+            label="进入预约页弹窗"
+            valuePropName="checked"
+            style={{ marginBottom: noticeEnabled ? 0 : 8 }}
+          >
+            <Switch checkedChildren="开启" unCheckedChildren="关闭" />
+          </Form.Item>
+          {noticeEnabled && (
+            <Form.Item
+              name="noticeContent"
+              label="提示内容"
+              rules={[{ required: true, message: '请输入提示内容' }]}
+              style={{ marginBottom: 0, marginTop: 8, width: '100%' }}
+            >
+              <TextArea rows={3} placeholder="进入预约页时弹窗展示的温馨提示内容" style={{ width: 500 }} />
+            </Form.Item>
+          )}
         </Card>
       </Form>
 

@@ -36,6 +36,11 @@ export interface PaymentConfig {
   freeQuotaLimit?: number
 }
 
+export interface NoticeConfig {
+  enabled: boolean
+  content: string
+}
+
 export interface Banner {
   imageUrl: string
 }
@@ -48,6 +53,7 @@ export interface SystemConfig {
   bannersJson: string
   timeSlotLimitJson: string
   paymentConfigJson: string
+  noticeConfigJson: string
   createdAt: string
   updatedAt: string
 }
@@ -58,6 +64,7 @@ export interface UpdateSystemConfigDto {
   banners?: Banner[]
   timeSlotLimit: TimeSlotLimit
   paymentConfig: PaymentConfig
+  noticeConfig?: NoticeConfig
 }
 
 // 预约订单
