@@ -85,7 +85,7 @@ export default function SystemConfigPage() {
       },
       noticeConfig: {
         enabled: values.noticeEnabled,
-        content: values.noticeContent,
+        content: values.noticeContent ? values.noticeContent : "",
       },
     })
   }
@@ -118,7 +118,7 @@ export default function SystemConfigPage() {
         },
         noticeConfig: {
           enabled: values.noticeEnabled,
-          content: values.noticeContent,
+          content: values.noticeContent ? values.noticeContent : "",
         },
       })
       if (res.success) {
