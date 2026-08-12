@@ -1,5 +1,6 @@
 import { Layout, Menu, Avatar, Dropdown, theme } from 'antd'
 import {
+  DashboardOutlined,
   NotificationOutlined,
   SettingOutlined,
   OrderedListOutlined,
@@ -15,6 +16,11 @@ import { useAuthStore } from '../stores/authStore'
 const { Header, Sider, Content } = Layout
 
 const menuItems = [
+  {
+    key: '/dashboard',
+    icon: <DashboardOutlined />,
+    label: '经营统计',
+  },
   {
     key: '/announcements',
     icon: <NotificationOutlined />,

@@ -6,6 +6,7 @@ import "dayjs/locale/zh-cn";
 import AuthGuard from "./components/AuthGuard";
 import MainLayout from "./layouts/MainLayout";
 import LoginPage from "./pages/login";
+import DashboardPage from "./pages/dashboard";
 import AnnouncementsPage from "./pages/announcements";
 import SystemConfigPage from "./pages/system-config";
 import OrdersPage from "./pages/orders";
@@ -54,7 +55,8 @@ export default function App() {
                 </AuthGuard>
               }
             >
-              <Route index element={<Navigate to="/announcements" replace />} />
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<DashboardPage />} />
               <Route path="announcements" element={<AnnouncementsPage />} />
               <Route path="system-config" element={<SystemConfigPage />} />
               <Route path="orders" element={<OrdersPage />} />

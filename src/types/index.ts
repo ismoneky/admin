@@ -222,3 +222,45 @@ export interface ApiResponse<T = unknown> {
   data?: T
   error?: unknown
 }
+
+// 经营统计
+export interface BookingDashboardRange {
+  startDate: string
+  endDate: string
+}
+
+export interface BookingDashboardSummary {
+  validOrderCount: number
+  totalPeople: number
+  selfDrivingVehicleCount: number
+  receivedAmount: number // 分
+  freePeople: number
+  paidPeople: number
+}
+
+export interface BookingDashboardStatusItem {
+  status: BookingStatus
+  orderCount: number
+}
+
+export interface BookingDashboardTravelModeItem {
+  travelMode: TravelMode
+  orderCount: number
+  peopleCount: number
+}
+
+export interface BookingDashboardDailyTrendItem {
+  date: string
+  validOrderCount: number
+  peopleCount: number
+  selfDrivingVehicleCount: number
+  receivedAmount: number // 分
+}
+
+export interface BookingDashboardResponse {
+  range: BookingDashboardRange
+  summary: BookingDashboardSummary
+  statusDistribution: BookingDashboardStatusItem[]
+  travelModeDistribution: BookingDashboardTravelModeItem[]
+  dailyTrend: BookingDashboardDailyTrendItem[]
+}
