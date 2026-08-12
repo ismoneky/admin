@@ -10,7 +10,7 @@ import DailyDetailTable from './components/DailyDetailTable'
 
 const { RangePicker } = DatePicker
 
-type Preset = 'today' | 'tomorrow' | 'last7' | 'month' | 'custom'
+type Preset = 'today' | 'yesterday' | 'last7' | 'month' | 'custom'
 
 /** 生成 YYYY-MM-DD，不传时间戳给后端 */
 function fmt(d: Dayjs): string {
@@ -63,8 +63,8 @@ export default function DashboardPage() {
       case 'today':
         next = [today, today]
         break
-      case 'tomorrow':
-        next = [today.add(1, 'day'), today.add(1, 'day')]
+      case 'yesterday':
+        next = [today.subtract(1, 'day'), today.subtract(1, 'day')]
         break
       case 'last7':
         // 含今天在内向前 7 个自然日
@@ -92,12 +92,12 @@ export default function DashboardPage() {
   }
 
   return (
-    <div>
+    <div style={{height: '82vh', overflow: 'hidden', overflowY: 'auto'}}>
       <Space direction="vertical" size={16} style={{ width: '100%' }}>
         <Space wrap>
           <Radio.Group value={preset} onChange={(e) => applyPreset(e.target.value as Preset)}>
             <Radio.Button value="today">今日</Radio.Button>
-            <Radio.Button value="tomorrow">明日</Radio.Button>
+            <Radio.Button value="yesterday">昨日</Radio.Button>
             <Radio.Button value="last7">最近 7 天</Radio.Button>
             <Radio.Button value="month">本月</Radio.Button>
             <Radio.Button value="custom">自定义</Radio.Button>
