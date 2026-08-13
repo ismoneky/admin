@@ -306,7 +306,7 @@ export default function OrdersPage() {
             <Descriptions.Item label="商户订单ID" span={2}>{currentRecord.outTradeNo}</Descriptions.Item>
             <Descriptions.Item label="姓名">{currentRecord.name}</Descriptions.Item>
             <Descriptions.Item label="手机号">{currentRecord.phone}</Descriptions.Item>
-            <Descriptions.Item label="身份证号" span={2}>{currentRecord.idCard}</Descriptions.Item>
+            <Descriptions.Item label="身份证号" span={2}>{maskIdCardText(currentRecord.idCard)}</Descriptions.Item>
             <Descriptions.Item label="预约日期">{currentRecord.bookingDate}</Descriptions.Item>
             <Descriptions.Item label="时间段">
               {TIME_SLOT_MAP[currentRecord.timeSlot] ?? currentRecord.timeSlot}
