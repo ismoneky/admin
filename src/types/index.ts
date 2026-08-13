@@ -78,10 +78,29 @@ export type BookingStatus =
   | 'cancelled'
   | 'refunded'
 
+export type PassengerType = 'adult' | 'child' | 'senior'
+
+export type PassengerPricingReason =
+  | 'member_order_free'
+  | 'daily_quota_order_free'
+  | 'child_age_free'
+  | 'senior_age_free'
+  | 'id_card_unavailable'
+  | 'regular'
+
+export type FreeReason = 'member' | 'dailyQuota' | 'age' | null
+
 export interface Passenger {
   name: string
   phone: string
   idCard: string
+  // 以下新字段均为可选，兼容旧订单快照（旧订单读取层按默认值归一化，不重新计算年龄）
+  passengerType?: PassengerType
+  idCardUnavailable?: boolean
+  ageValue?: number | null
+  ageFree?: boolean
+  finalCharged?: boolean
+  pricingReason?: PassengerPricingReason
 }
 
 export interface Booking {
@@ -103,7 +122,7 @@ export interface Booking {
   remarks?: string
   status: BookingStatus
   isFree?: boolean
-  freeReason?: string | null
+  freeReason?: FreeReason
   amount?: number | null
   createdAt: string
   updatedAt: string

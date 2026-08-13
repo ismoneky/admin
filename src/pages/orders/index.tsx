@@ -17,6 +17,12 @@ import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { getBookings, exportBookings } from '../../api/bookings'
 import type { Booking, BookingQueryParams, TimeSlot, BookingStatus, Passenger } from '../../types'
+import {
+  normalizePassengerForDisplay,
+  getPassengerTypeLabel,
+  getAgeFreeStatusText,
+  maskIdCardText,
+} from '../../utils/passenger'
 
 function parsePassengers(passengers: string | Passenger[] | undefined): Passenger[] {
   if (!passengers) return []
@@ -33,6 +39,7 @@ const TIME_SLOT_MAP: Record<TimeSlot, string> = {
 const FREE_REASON_MAP: Record<string, { label: string; color: string }> = {
   member: { label: '会员免费', color: 'gold' },
   dailyQuota: { label: '每日免费', color: 'cyan' },
+  age: { label: '年龄免费', color: 'green' },
 }
 
 const TRAVEL_MODE_MAP = {
@@ -62,6 +69,13 @@ export default function OrdersPage() {
   const [detailVisible, setDetailVisible] = useState(false)
   const [currentRecord, setCurrentRecord] = useState<Booking | null>(null)
   const [queryParams, setQueryParams] = useState<BookingQueryParams>({ page: 1, pageSize: 10 })
+
+  // 详情弹窗的人员快照（旧订单按 2.2 默认值归一化，不重新计算年龄）
+  const displayPassengers = currentRecord
+    ? parsePassengers(currentRecord.passengers).map((p) => normalizePassengerForDisplay(p, currentRecord))
+    : []
+  const freePeopleCount = displayPassengers.filter((p) => !p.finalCharged).length
+  const chargedPeopleCount = displayPassengers.filter((p) => p.finalCharged).length
 
   const fetchData = useCallback(async (params: BookingQueryParams) => {
     setLoading(true)
@@ -117,7 +131,9 @@ export default function OrdersPage() {
   const handleExport = async () => {
     message.loading({ content: '正在导出...', key: 'export' })
     try {
-      const { page: _page, pageSize: _pageSize, ...exportParams } = queryParams
+      const exportParams: BookingQueryParams = { ...queryParams }
+      delete exportParams.page
+      delete exportParams.pageSize
       const blob = await exportBookings(exportParams); // 现在类型是 Blob
       console.log(blob)
       const url = URL.createObjectURL(blob)
@@ -298,25 +314,39 @@ export default function OrdersPage() {
             <Descriptions.Item label="出行方式">
               {TRAVEL_MODE_MAP[currentRecord.travelMode as keyof typeof TRAVEL_MODE_MAP] ?? currentRecord.travelMode}
             </Descriptions.Item>
-            <Descriptions.Item label="预约人数">{currentRecord.personCount} 人</Descriptions.Item>
-            {(() => {
-              const passengers = parsePassengers(currentRecord.passengers)
-              if (passengers.length === 0) return null
-              return (
-                <Descriptions.Item label="出行人员" span={2}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {passengers.map((p, i) => (
-                      <div key={i} style={{ padding: '8px 12px', background: '#f7f8fd', borderRadius: 6, fontSize: 13 }}>
-                        <span style={{ fontWeight: 600 }}>{i === 0 ? `联系人` : `第${i + 1}位`}：</span>
+            <Descriptions.Item label="预约人数">
+              {currentRecord.personCount} 人
+              {displayPassengers.length > 0 && (
+                <span style={{ marginLeft: 8, color: '#666', fontSize: 12 }}>
+                  （免费 {freePeopleCount} 人 · 收费 {chargedPeopleCount} 人）
+                </span>
+              )}
+            </Descriptions.Item>
+            {displayPassengers.length > 0 && (
+              <Descriptions.Item label="出行人员" span={2}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {displayPassengers.map((p, i) => (
+                    <div key={i} style={{ padding: '8px 12px', background: '#f7f8fd', borderRadius: 6, fontSize: 13 }}>
+                      <div>
+                        <span style={{ fontWeight: 600 }}>{getPassengerTypeLabel(p.passengerType, i)}：</span>
                         <span>{p.name}</span>
                         <span style={{ marginLeft: 16, color: '#666' }}>{p.phone}</span>
-                        <span style={{ marginLeft: 16, color: '#999' }}>{p.idCard}</span>
+                        <span style={{ marginLeft: 16, color: '#999' }}>{maskIdCardText(p.idCard)}</span>
                       </div>
-                    ))}
-                  </div>
-                </Descriptions.Item>
-              )
-            })()}
+                      {/* 计费状态：年龄免费（绿）/ 未提供身份证（黄）/ 整单免费 / 正常收费 */}
+                      <div style={{ marginTop: 4, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                        {getAgeFreeStatusText(p) && <Tag color="green">{getAgeFreeStatusText(p)}</Tag>}
+                        {p.idCardUnavailable && (
+                          <Tag color="gold">未提供身份证号 · 按正常价格收费 · 暂时无法投保</Tag>
+                        )}
+                        {!p.ageFree && !p.idCardUnavailable && !p.finalCharged && <Tag color="green">整单免费</Tag>}
+                        {!p.ageFree && !p.idCardUnavailable && p.finalCharged && <Tag>正常收费</Tag>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Descriptions.Item>
+            )}
             {currentRecord.licensePlate && (
               <Descriptions.Item label="车牌号">{currentRecord.licensePlate}</Descriptions.Item>
             )}
