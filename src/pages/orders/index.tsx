@@ -251,7 +251,7 @@ export default function OrdersPage() {
           <DatePicker placeholder="选择日期" />
         </Form.Item>
         <Form.Item name="createdRange" label="创建日期">
-          <DatePicker.RangePicker placeholder={['开始', '结束']} style={{ width: 240 }} />
+          <DatePicker.RangePicker placeholder={['开始', '结束']} style={{ width: 'min(240px, calc(100vw - 48px))' }} />
         </Form.Item>
         <Form.Item name="status" label="订单状态">
           <Select mode="multiple" placeholder="全部" style={{ minWidth: 160 }} allowClear maxTagCount="responsive">
@@ -263,7 +263,7 @@ export default function OrdersPage() {
           </Select>
         </Form.Item>
         <Form.Item name="keyword" label="关键字">
-          <Input placeholder="姓名 / 手机号 / 订单号" style={{ width: 200 }} allowClear />
+          <Input placeholder="姓名 / 手机号 / 订单号" style={{ width: 'min(200px, calc(100vw - 48px))' }} allowClear />
         </Form.Item>
         <Form.Item>
           <Space>
@@ -299,10 +299,10 @@ export default function OrdersPage() {
         open={detailVisible}
         onCancel={() => setDetailVisible(false)}
         footer={null}
-        width={700}
+        width={{ xs: 'calc(100vw - 32px)', sm: 700 }}
       >
         {currentRecord && (
-          <Descriptions bordered column={2} size="small" style={{ marginTop: 16 }}>
+          <Descriptions bordered column={{ xs: 1, sm: 2 }} size="small" style={{ marginTop: 16 }}>
             <Descriptions.Item label="商户订单ID" span={2}>{currentRecord.outTradeNo}</Descriptions.Item>
             <Descriptions.Item label="姓名">{currentRecord.name}</Descriptions.Item>
             <Descriptions.Item label="手机号">{currentRecord.phone}</Descriptions.Item>

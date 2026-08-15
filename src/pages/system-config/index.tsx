@@ -249,7 +249,7 @@ export default function SystemConfigPage() {
               rules={[{ required: true, message: '请输入提示文案' }]}
               style={{ marginBottom: 0, marginTop: 8, width: '100%' }}
             >
-              <TextArea rows={2} placeholder="请输入关闭预约时展示给用户的提示信息" style={{ width: 400 }} />
+              <TextArea rows={2} placeholder="请输入关闭预约时展示给用户的提示信息" style={{ width: '100%', maxWidth: 400 }} />
             </Form.Item>
           )}
         </Card>
@@ -299,7 +299,7 @@ export default function SystemConfigPage() {
               rules={[{ required: true, message: '请输入提示内容' }]}
               style={{ marginBottom: 0, marginTop: 8, width: '100%' }}
             >
-              <TextArea rows={3} placeholder="进入预约页时弹窗展示的温馨提示内容" style={{ width: 500 }} />
+              <TextArea rows={3} placeholder="进入预约页时弹窗展示的温馨提示内容" style={{ width: '100%', maxWidth: 500 }} />
             </Form.Item>
           )}
         </Card>

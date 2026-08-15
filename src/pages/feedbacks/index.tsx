@@ -65,12 +65,12 @@ export default function FeedbacksPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, gap: 8, flexWrap: 'wrap' }}>
         <h2 style={{ margin: 0 }}>反馈统计</h2>
         <Input.Search
           placeholder="搜索手机号 / 内容 / OpenID"
           allowClear
-          style={{ width: 260 }}
+          style={{ width: 'min(260px, calc(100vw - 80px))' }}
           onSearch={setKeyword}
           onChange={(e) => { if (!e.target.value) setKeyword('') }}
         />

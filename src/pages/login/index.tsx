@@ -34,7 +34,12 @@ export default function LoginPage() {
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       }}
     >
-      <Card style={{ width: 400, boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+      <Card
+        style={{
+          width: 'min(400px, calc(100vw - 32px))',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+        }}
+      >
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <h2 style={{ margin: 0, fontSize: 24, color: '#1a1a1a' }}>后台管理系统</h2>
           <p style={{ color: '#888', marginTop: 8 }}>请使用管理员账号登录</p>

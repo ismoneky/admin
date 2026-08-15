@@ -350,7 +350,7 @@ export default function MembersPage() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onPressEnter={handleSearch}
-            style={{ width: 300 }}
+            style={{ width: 'min(300px, calc(100vw - 200px))', minWidth: 160 }}
             prefix={<SearchOutlined />}
             allowClear
           />
