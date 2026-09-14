@@ -9,7 +9,11 @@ import {
   SolutionOutlined,
   MessageOutlined,
   CrownOutlined,
+  DollarOutlined,
   MenuOutlined,
+  SendOutlined,
+  FieldTimeOutlined,
+  FileSearchOutlined,
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
@@ -39,6 +43,11 @@ const menuItems = [
     label: '订单查询',
   },
   {
+    key: '/refunds',
+    icon: <DollarOutlined />,
+    label: '退款审核',
+  },
+  {
     key: '/applications',
     icon: <SolutionOutlined />,
     label: '管理员申请',
@@ -52,6 +61,24 @@ const menuItems = [
     key: '/members',
     icon: <CrownOutlined />,
     label: '月卡会员',
+  },
+  {
+    // 与「反馈统计」的 MessageOutlined 区分：这里用的是发送语义的图标
+    key: '/messages',
+    icon: <SendOutlined />,
+    label: '发送消息',
+  },
+  {
+    // 手动触发后端定时任务，运维/测试用；有真实副作用，页面里每个按钮都套了二次确认
+    key: '/tasks',
+    icon: <FieldTimeOutlined />,
+    label: '定时任务',
+  },
+  {
+    // 结构化业务日志（logs.db，保留 30 天）；不含后端 stdout 日志，页面顶部写明了
+    key: '/logs',
+    icon: <FileSearchOutlined />,
+    label: '日志查询',
   },
 ]
 

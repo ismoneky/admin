@@ -10,6 +10,7 @@ import {
   Tag,
   Modal,
   Descriptions,
+  Tooltip,
   message,
 } from 'antd'
 import { SearchOutlined, ReloadOutlined, ExportOutlined, EyeOutlined } from '@ant-design/icons'
@@ -23,6 +24,7 @@ import {
   getAgeFreeStatusText,
   maskIdCardText,
 } from '../../utils/passenger'
+import { BOOKING_STATUS_MAP as STATUS_MAP } from '../../constants/booking'
 
 function parsePassengers(passengers: string | Passenger[] | undefined): Passenger[] {
   if (!passengers) return []
@@ -51,14 +53,6 @@ const TRAVEL_MODE_MAP = {
 const VEHICLE_TYPE_MAP: Record<string, { label: string; color: string }> = {
   wheelMotorcycle: { label: '摩托车', color: 'volcano' },
   smallCar: { label: '小客车', color: 'geekblue' },
-}
-
-const STATUS_MAP: Record<BookingStatus, { label: string; color: string }> = {
-  pending: { label: '待支付', color: 'orange' },
-  confirmed: { label: '已支付', color: 'blue' },
-  completed: { label: '已完成', color: 'green' },
-  cancelled: { label: '已取消', color: 'red' },
-  refunded: { label: '已退款', color: 'purple' },
 }
 
 export default function OrdersPage() {
@@ -211,7 +205,44 @@ export default function OrdersPage() {
       width: 100,
       render: (v: BookingStatus) => {
         const s = STATUS_MAP[v]
-        return s ? <Tag color={s.color}>{s.label}</Tag> : v
+        return s ? <Tag color={s.tagColor}>{s.label}</Tag> : v
+      },
+    },
+    {
+      // 核销留痕（bookings.verifiedAt / verifiedBy）。**只有 completed 有值**——
+      // 唯一写入方是核销员扫码，定时任务只写 expiredAt，不碰这里。
+      // 所以「已完成但核销时间空」= 数据异常，这一列就是拿来区分这个的。
+      title: '核销时间',
+      dataIndex: 'verifiedAt',
+      width: 175,
+      render: (v: string | null | undefined, record: Booking) => {
+        if (!v) {
+          // 「已完成但没有留痕」只可能是**留痕字段上线之前**核销的订单
+          // （`status=completed` 的有效写入方只有 `markVerified`，它必写这两个字段）。
+          // 直接显示 '-' 会让人以为是前端没渲染，所以说清楚。
+          if (record.status === 'completed') {
+            return (
+              <Tooltip title="核销留痕是后加的字段，该单在此之前就已核销">
+                <span style={{ color: '#bbb' }}>无留痕</span>
+              </Tooltip>
+            )
+          }
+          return '-'
+        }
+        // 姓名解析不到时回落显示 openid（28 位，会溢出，所以截断 + hover 出全文）——
+        // 后台是追责场景，有原始标识好过显示一个「未知」
+        const verifier = record.verifiedByName || record.verifiedBy || '—'
+        return (
+          <div>
+            <div>{dayjs(v).format('YYYY-MM-DD HH:mm')}</div>
+            <div
+              title={verifier}
+              style={{ fontSize: 12, color: '#999', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              核销人：{verifier}
+            </div>
+          </div>
+        )
       },
     },
     {
@@ -365,7 +396,7 @@ export default function OrdersPage() {
             )}
             <Descriptions.Item label="订单状态">
               {STATUS_MAP[currentRecord.status] ? (
-                <Tag color={STATUS_MAP[currentRecord.status].color}>
+                <Tag color={STATUS_MAP[currentRecord.status].tagColor}>
                   {STATUS_MAP[currentRecord.status].label}
                 </Tag>
               ) : currentRecord.status}
@@ -386,6 +417,11 @@ export default function OrdersPage() {
             {currentRecord.remarks && (
               <Descriptions.Item label="备注" span={2}>{currentRecord.remarks}</Descriptions.Item>
             )}
+            <Descriptions.Item label="核销时间" span={2}>
+              {currentRecord.verifiedAt
+                ? `${dayjs(currentRecord.verifiedAt).format('YYYY-MM-DD HH:mm:ss')}（核销人：${currentRecord.verifiedByName || currentRecord.verifiedBy || '—'}）`
+                : '-'}
+            </Descriptions.Item>
             <Descriptions.Item label="创建时间">
               {dayjs(currentRecord.createdAt).format('YYYY-MM-DD HH:mm:ss')}
             </Descriptions.Item>

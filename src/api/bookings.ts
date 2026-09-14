@@ -1,9 +1,7 @@
 import request from "./request";
 import type {
-  Booking,
   BookingQueryParams,
   BookingListResponse,
-  ApiResponse,
 } from "../types";
 
 export const getBookings = (params?: BookingQueryParams) =>
@@ -11,6 +9,3 @@ export const getBookings = (params?: BookingQueryParams) =>
 
 export const exportBookings = (params?: BookingQueryParams): Promise<Blob> =>
   request.get("/admin/bookings/export", { params, responseType: "blob" });
-
-export const getBookingById = (bookingId: string) =>
-  request.get<never, ApiResponse<Booking>>(`/bookings/${bookingId}`);

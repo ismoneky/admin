@@ -2,29 +2,13 @@ import { Card, Col, Row, Empty, Progress, Descriptions } from 'antd'
 import type {
   BookingDashboardStatusItem,
   BookingDashboardTravelModeItem,
-  BookingStatus,
   TravelMode,
 } from '../../../types'
+import { BOOKING_STATUS_MAP } from '../../../constants/booking'
 
 interface DistributionPanelsProps {
   statusDistribution: BookingDashboardStatusItem[]
   travelModeDistribution: BookingDashboardTravelModeItem[]
-}
-
-const STATUS_LABEL: Record<BookingStatus, string> = {
-  pending: '待支付',
-  confirmed: '已支付',
-  completed: '已完成',
-  cancelled: '已取消',
-  refunded: '已退款',
-}
-
-const STATUS_COLOR: Record<BookingStatus, string> = {
-  pending: '#fa8c16',
-  confirmed: '#1677ff',
-  completed: '#52c41a',
-  cancelled: '#ff4d4f',
-  refunded: '#722ed1',
 }
 
 const TRAVEL_MODE_LABEL: Record<TravelMode, string> = {
@@ -51,12 +35,14 @@ export default function DistributionPanels({ statusDistribution, travelModeDistr
               {statusDistribution.map((d) => (
                 <div key={d.status}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ color: STATUS_COLOR[d.status] }}>{STATUS_LABEL[d.status]}</span>
+                    <span style={{ color: BOOKING_STATUS_MAP[d.status]?.barColor ?? '#8c8c8c' }}>
+                      {BOOKING_STATUS_MAP[d.status]?.label ?? d.status}
+                    </span>
                     <span>{d.orderCount}</span>
                   </div>
                   <Progress
                     percent={Math.round((d.orderCount / maxStatus) * 100)}
-                    strokeColor={STATUS_COLOR[d.status]}
+                    strokeColor={BOOKING_STATUS_MAP[d.status]?.barColor ?? '#8c8c8c'}
                     showInfo={false}
                   />
                 </div>

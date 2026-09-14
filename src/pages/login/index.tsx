@@ -15,7 +15,8 @@ export default function LoginPage() {
     try {
       const res = await adminLogin(values)
       if (res.success && res.data) {
-        setAuth(res.data.apiKey, res.data.name, res.data.username)
+        // adminToken 用于审核留痕（12h 后失效不影响登录态，见 authStore 注释）
+        setAuth(res.data.apiKey, res.data.name, res.data.username, res.data.adminToken)
         message.success('登录成功')
         navigate('/', { replace: true })
       }

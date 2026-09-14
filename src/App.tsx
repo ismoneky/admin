@@ -10,9 +10,13 @@ import DashboardPage from "./pages/dashboard";
 import AnnouncementsPage from "./pages/announcements";
 import SystemConfigPage from "./pages/system-config";
 import OrdersPage from "./pages/orders";
+import RefundsPage from "./pages/refunds";
 import ApplicationsPage from "./pages/applications";
 import FeedbacksPage from "./pages/feedbacks";
 import MembersPage from "./pages/members";
+import MessagesPage from "./pages/messages";
+import TasksPage from "./pages/tasks";
+import LogsPage from "./pages/logs";
 
 dayjs.locale("zh-cn");
 
@@ -60,9 +64,13 @@ export default function App() {
               <Route path="announcements" element={<AnnouncementsPage />} />
               <Route path="system-config" element={<SystemConfigPage />} />
               <Route path="orders" element={<OrdersPage />} />
+              <Route path="refunds" element={<RefundsPage />} />
               <Route path="applications" element={<ApplicationsPage />} />
               <Route path="feedbacks" element={<FeedbacksPage />} />
+              <Route path="messages" element={<MessagesPage />} />
               <Route path="members" element={<MembersPage />} />
+              <Route path="tasks" element={<TasksPage />} />
+              <Route path="logs" element={<LogsPage />} />
             </Route>
           </Routes>
           <Beian />

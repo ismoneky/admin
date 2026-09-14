@@ -3,14 +3,19 @@ import { message } from 'antd'
 import { useAuthStore } from '../stores/authStore'
 
 const request = axios.create({
-  baseURL: '/api',
+  baseURL: '/test',
   timeout: 10000,
 })
 
 request.interceptors.request.use((config) => {
-  const apiKey = useAuthStore.getState().apiKey
+  const { apiKey, adminToken } = useAuthStore.getState()
   if (apiKey) {
     config.headers['x-admin-key'] = `${apiKey}`
+  }
+  // adminToken 仅用于识别操作人（阶段 3 §4.3.4）；无它时后端仍凭 apiKey 放行，
+  // 只是审核记录里 operator 为 null。两个头同时带是设计如此，不是重复鉴权。
+  if (adminToken) {
+    config.headers['x-admin-token'] = adminToken
   }
   return config
 })
