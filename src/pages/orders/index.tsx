@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import {
   Table,
   Form,
@@ -10,12 +10,16 @@ import {
   Tag,
   Modal,
   Descriptions,
+  Alert,
   message,
 } from 'antd'
-import { SearchOutlined, ReloadOutlined, ExportOutlined, EyeOutlined } from '@ant-design/icons'
+import { SearchOutlined, ReloadOutlined, ExportOutlined, EyeOutlined, RollbackOutlined, HistoryOutlined, ClearOutlined, CheckSquareOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { getBookings, exportBookings } from '../../api/bookings'
+import { getBookingIds, getBatchRefundTasks } from '../../api/batchRefund'
+import BatchRefundModal from './BatchRefundModal'
+import BatchRefundHistory from './BatchRefundHistory'
 import type { Booking, BookingQueryParams, TimeSlot, BookingStatus, Passenger } from '../../types'
 import {
   normalizePassengerForDisplay,
@@ -70,6 +74,29 @@ export default function OrdersPage() {
   const [currentRecord, setCurrentRecord] = useState<Booking | null>(null)
   const [queryParams, setQueryParams] = useState<BookingQueryParams>({ page: 1, pageSize: 10 })
 
+  // 批量退款：勾选集合（跨页保留）、弹层与历史抽屉状态
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [selectAllLoading, setSelectAllLoading] = useState(false)
+  const [refundModal, setRefundModal] = useState<{ bookingIds?: string[]; taskId?: string } | null>(null)
+  const [historyOpen, setHistoryOpen] = useState(false)
+
+  // 表格区域自适应高度：实测容器高度 - 表头/分页占位，避免写死 calc 导致的分页器重叠
+  const tableWrapRef = useRef<HTMLDivElement>(null)
+  const [tableY, setTableY] = useState<number>()
+
+  useEffect(() => {
+    const el = tableWrapRef.current
+    if (!el) return
+    const measure = () => {
+      // 预留表头(~47px)+分页器(~48px)+安全余量，多减不产生重叠，只是底部略留白
+      setTableY(Math.max(120, el.clientHeight - 100))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   // 详情弹窗的人员快照（旧订单按 2.2 默认值归一化，不重新计算年龄）
   const displayPassengers = currentRecord
     ? parsePassengers(currentRecord.passengers).map((p) => normalizePassengerForDisplay(p, currentRecord))
@@ -97,6 +124,37 @@ export default function OrdersPage() {
   useEffect(() => {
     fetchData(queryParams)
   }, [queryParams, fetchData])
+
+  // 进入页面时检查是否有 RUNNING 批量退款任务：有则自动打开进度面板（任务跨页面存续）
+  useEffect(() => {
+    getBatchRefundTasks(1)
+      .then((res) => {
+        const latest = res.data?.[0]
+        if (res.success && latest && latest.status === 'RUNNING') {
+          setRefundModal({ taskId: latest.taskId })
+        }
+      })
+      .catch(() => undefined)
+  }, [])
+
+  // 全选当前筛选结果：经 /admin/bookings/ids 收集全部匹配 ID（超 1000 后端报错）
+  const handleSelectAllByFilter = async () => {
+    setSelectAllLoading(true)
+    try {
+      const params: BookingQueryParams = { ...queryParams }
+      delete params.page
+      delete params.pageSize
+      const res = await getBookingIds(params)
+      if (res.success && res.data) {
+        setSelectedIds((prev) => Array.from(new Set([...prev, ...res.data!.ids])))
+        message.success(`已选入 ${res.data.total} 个订单`)
+      }
+    } catch {
+      // 拦截器已提示（超限时后端返回 400 并说明）
+    } finally {
+      setSelectAllLoading(false)
+    }
+  }
 
   const handleSearch = () => {
     const values = form.getFieldsValue()
@@ -237,61 +295,109 @@ export default function OrdersPage() {
   ]
 
   return (
-    <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h2 style={{ margin: 0 }}>订单查询</h2>
-        <Button icon={<ExportOutlined />} onClick={handleExport}>
-          导出 Excel
-        </Button>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ flexShrink: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+            <h2 style={{ margin: 0 }}>订单查询</h2>
+            <Space>
+              <Button icon={<HistoryOutlined />} onClick={() => setHistoryOpen(true)}>
+                退款任务
+              </Button>
+              <Button icon={<ExportOutlined />} onClick={handleExport}>
+                导出 Excel
+              </Button>
+            </Space>
+          </div>
+
+          {/* 筛选区 */}
+          <Form form={form} layout="inline" style={{ marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+          <Form.Item name="bookingDate" label="预约日期">
+            <DatePicker placeholder="选择日期" />
+          </Form.Item>
+          <Form.Item name="createdRange" label="创建日期">
+            <DatePicker.RangePicker placeholder={['开始', '结束']} style={{ width: 'min(240px, calc(100vw - 48px))' }} />
+          </Form.Item>
+          <Form.Item name="status" label="订单状态">
+            <Select mode="multiple" placeholder="全部" style={{ minWidth: 160 }} allowClear maxTagCount="responsive">
+              {Object.entries(STATUS_MAP).map(([key, val]) => (
+                <Select.Option key={key} value={key}>
+                  {val.label}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="keyword" label="关键字">
+            <Input placeholder="姓名 / 手机号 / 订单号" style={{ width: 'min(200px, calc(100vw - 48px))' }} allowClear />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
+                查询
+              </Button>
+              <Button icon={<ReloadOutlined />} onClick={handleReset}>
+                重置
+              </Button>
+              <Button icon={<CheckSquareOutlined />} loading={selectAllLoading} onClick={handleSelectAllByFilter}>
+                全选筛选结果
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+
+        {/* 批量退款操作栏：有勾选时出现（通栏 Alert，与表格同宽） */}
+        {selectedIds.length > 0 && (
+          <Alert
+            type="info"
+            style={{ marginBottom: 12 }}
+            message={
+              <span>
+                已选 <b>{selectedIds.length}</b> 个订单
+              </span>
+            }
+            action={
+              <Space>
+                <Button size="small" icon={<ClearOutlined />} onClick={() => setSelectedIds([])}>
+                  清空
+                </Button>
+                <Button
+                  size="small"
+                  type="primary"
+                  danger
+                  icon={<RollbackOutlined />}
+                  onClick={() => setRefundModal({ bookingIds: selectedIds })}
+                >
+                  批量退款
+                </Button>
+              </Space>
+            }
+          />
+        )}
       </div>
 
-      {/* 筛选区 */}
-      <Form form={form} layout="inline" style={{ marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-        <Form.Item name="bookingDate" label="预约日期">
-          <DatePicker placeholder="选择日期" />
-        </Form.Item>
-        <Form.Item name="createdRange" label="创建日期">
-          <DatePicker.RangePicker placeholder={['开始', '结束']} style={{ width: 'min(240px, calc(100vw - 48px))' }} />
-        </Form.Item>
-        <Form.Item name="status" label="订单状态">
-          <Select mode="multiple" placeholder="全部" style={{ minWidth: 160 }} allowClear maxTagCount="responsive">
-            {Object.entries(STATUS_MAP).map(([key, val]) => (
-              <Select.Option key={key} value={key}>
-                {val.label}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item name="keyword" label="关键字">
-          <Input placeholder="姓名 / 手机号 / 订单号" style={{ width: 'min(200px, calc(100vw - 48px))' }} allowClear />
-        </Form.Item>
-        <Form.Item>
-          <Space>
-            <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
-              查询
-            </Button>
-            <Button icon={<ReloadOutlined />} onClick={handleReset}>
-              重置
-            </Button>
-          </Space>
-        </Form.Item>
-      </Form>
-
-      <Table
-        rowKey="id"
-        columns={columns}
-        dataSource={data}
-        loading={loading}
-        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
-        pagination={{
-          current: pagination.page,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showTotal: (t) => `共 ${t} 条`,
-          showSizeChanger: true,
-          onChange: handleTableChange,
-        }}
-      />
+      {/* 表格区域：占满剩余高度，body 滚动，分页器始终在容器内底部 */}
+      <div ref={tableWrapRef} style={{ flex: 1, minHeight: 0 }}>
+        <Table
+          className="orders-table"
+          rowKey="bookingId"
+          rowSelection={{
+            selectedRowKeys: selectedIds,
+            onChange: (keys) => setSelectedIds(keys as string[]),
+            preserveSelectedRowKeys: true,
+          }}
+          columns={columns}
+          dataSource={data}
+          loading={loading}
+          scroll={{ x: 900, y: tableY }}
+          pagination={{
+            current: pagination.page,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showTotal: (t) => `共 ${t} 条`,
+            showSizeChanger: true,
+            onChange: handleTableChange,
+          }}
+        />
+      </div>
 
       {/* 详情弹窗 */}
       <Modal
@@ -395,6 +501,29 @@ export default function OrdersPage() {
           </Descriptions>
         )}
       </Modal>
-    </>
+
+      {/* 批量退款：预览/执行/进度 弹层 */}
+      <BatchRefundModal
+        open={refundModal !== null}
+        bookingIds={refundModal?.bookingIds}
+        taskId={refundModal?.taskId}
+        onClose={() => {
+          setRefundModal(null)
+          // 执行过的任务可能改变了订单状态与勾选集合有效性，刷新列表并清空选择
+          setSelectedIds([])
+          fetchData(queryParams)
+        }}
+      />
+
+      {/* 批量退款历史任务抽屉 */}
+      <BatchRefundHistory
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onViewTask={(taskId) => {
+          setHistoryOpen(false)
+          setRefundModal({ taskId })
+        }}
+      />
+    </div>
   )
 }
