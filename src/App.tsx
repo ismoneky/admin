@@ -16,7 +16,7 @@ import FeedbacksPage from "./pages/feedbacks";
 import MembersPage from "./pages/members";
 import MessagesPage from "./pages/messages";
 import TasksPage from "./pages/tasks";
-// import LogsPage from "./pages/logs";
+import LogsPage from "./pages/logs";
 
 dayjs.locale("zh-cn");
 
@@ -70,7 +70,7 @@ export default function App() {
               <Route path="messages" element={<MessagesPage />} />
               <Route path="members" element={<MembersPage />} />
               <Route path="tasks" element={<TasksPage />} />
-              {/* <Route path="logs" element={<LogsPage />} /> */}
+              <Route path="logs" element={<LogsPage />} />
             </Route>
           </Routes>
           <Beian />

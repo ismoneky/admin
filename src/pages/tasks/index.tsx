@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Card, Alert, Descriptions, Space, Popconfirm, Tag, InputNumber } from 'antd'
+import { Button, Card, Alert, Descriptions, Space, Popconfirm, Tag, InputNumber, Checkbox } from 'antd'
 import { PlayCircleOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { runExpireScan, runDailyReminder } from '../../api/tasks'
@@ -74,12 +74,15 @@ export default function TasksPage() {
   // 静默期（分钟）：默认 2 小时，测试时改成 0 就不必再干等
   const [expireQuiet, setExpireQuiet] = useState(DEFAULT_QUIET_MINUTES)
   const [dailyQuiet, setDailyQuiet] = useState(DEFAULT_QUIET_MINUTES)
+  // 过期边界是否含当天：**默认勾选**——这个接口的定位就是「把此刻之前清干净」，
+  // 不勾就等于退回定时任务的边界，管理员多半不是这个意图
+  const [expireIncludeToday, setExpireIncludeToday] = useState(true)
 
   // 失败（非 2xx）由 request 拦截器统一弹 message.error，这里只处理成功分支
   const handleExpire = async () => {
     setExpireRunning(true)
     try {
-      const res = await runExpireScan(expireQuiet)
+      const res = await runExpireScan(expireQuiet, expireIncludeToday)
       if (res.success && res.data) setExpireSnap({ at: stamp(), data: res.data })
     } finally {
       setExpireRunning(false)
@@ -97,7 +100,7 @@ export default function TasksPage() {
   }
 
   return (
-    <div style={{ maxWidth: 880 }}>
+    <div style={{ maxWidth: 880, height: '100%', overflow: 'auto' }}>
       <h2 style={{ margin: '0 0 16px' }}>定时任务</h2>
 
       <Alert
@@ -126,12 +129,30 @@ export default function TasksPage() {
           showIcon
           style={{ marginBottom: 16 }}
           message="会真实修改订单状态，并给对应用户发消息"
-          description="退款中/已退款、已核销、待支付的订单不会被扫到；预约日期是今天的也不会——判据是严格早于今天。"
+          description="退款中/已退款、已核销、待支付的订单不会被扫到。"
         />
+        <Space direction="vertical" size={4} style={{ marginBottom: 12 }}>
+          <Checkbox
+            checked={expireIncludeToday}
+            onChange={(e) => setExpireIncludeToday(e.target.checked)}
+          >
+            包含今天（把当天还没核销的订单也一并置为过期）
+          </Checkbox>
+          {expireIncludeToday ? (
+            <span style={{ color: '#ff4d4f', fontSize: 12 }}>
+              ⚠️ 当天未核销的订单会<b>当场作废</b>：之后再也无法核销，只能走退款申请审核；
+              当天名额同时被释放（当天会重新变成可预约）。要「封盘当天」请用预约开关。
+            </span>
+          ) : (
+            <span style={{ color: '#999', fontSize: 12 }}>
+              不勾选 = 与定时任务同一判据（严格早于今天），当天全天可核销，要等过了零点才下沉。
+            </span>
+          )}
+        </Space>
         <QuietWindowField value={expireQuiet} onChange={setExpireQuiet} />
         <Popconfirm
           title="确认立刻执行一次过期扫描？"
-          description={`会修改订单状态并给对应用户发送站内信，无法撤回。本次静默期 ${expireQuiet} 分钟。`}
+          description={`会修改订单状态并给对应用户发送站内信，无法撤回。本次静默期 ${expireQuiet} 分钟，边界「${expireIncludeToday ? '此刻之前（含当天）' : '严格早于今天'}」。`}
           okText="执行"
           cancelText="取消"
           onConfirm={handleExpire}
@@ -161,6 +182,9 @@ export default function TasksPage() {
               <Descriptions.Item label="静默期">{expireSnap.data.quietWindowMinutes} 分钟</Descriptions.Item>
               <Descriptions.Item label="转入过期">{expireSnap.data.expiredCount} 单</Descriptions.Item>
               <Descriptions.Item label="发出通知">{expireSnap.data.notifiedCount} 条</Descriptions.Item>
+              <Descriptions.Item label="过期边界">
+                {expireSnap.data.includedToday ? '此刻之前（含当天）' : '严格早于今天'}
+              </Descriptions.Item>
               <Descriptions.Item label="本轮被跳过">{expireSnap.data.skipped ? '是' : '否'}</Descriptions.Item>
             </Descriptions>
           </div>

@@ -403,6 +403,13 @@ export interface ExpireScanResult {
   notifiedCount: number
   /** 本次实际生效的静默期（分钟）。定时任务恒为 120；手动触发可覆盖 */
   quietWindowMinutes: number
+  /**
+   * 本次是否把**当天**的订单也算进了过期边界（`bookingDate <= 今天`）。
+   *
+   * 定时任务恒为 false（当天全天可核销）；手动触发默认 true。
+   * 回传出来是因为它决定了这一轮到底动了哪些单，看漏会误判成「任务没生效」。
+   */
+  includedToday: boolean
   /** 失败原因；null = 正常完成 */
   error: string | null
 }
