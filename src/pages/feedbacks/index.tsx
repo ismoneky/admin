@@ -4,6 +4,7 @@ import { EyeOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { getFeedbacks } from '../../api/feedbacks'
 import type { Feedback } from '../../types'
+import QueryFilterPanel, { QueryFilterItem } from '../../components/QueryFilterPanel'
 
 export default function FeedbacksPage() {
   const [list, setList] = useState<Feedback[]>([])
@@ -65,16 +66,17 @@ export default function FeedbacksPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, gap: 8, flexWrap: 'wrap' }}>
-        <h2 style={{ margin: 0 }}>反馈统计</h2>
-        <Input.Search
-          placeholder="搜索手机号 / 内容 / OpenID"
-          allowClear
-          style={{ width: 'min(260px, calc(100vw - 80px))' }}
-          onSearch={setKeyword}
-          onChange={(e) => { if (!e.target.value) setKeyword('') }}
-        />
-      </div>
+      <h2 style={{ margin: '0 0 16px' }}>反馈统计</h2>
+      <QueryFilterPanel columns={1} compact>
+        <QueryFilterItem label="搜索反馈">
+          <Input.Search
+            placeholder="搜索手机号 / 内容 / OpenID"
+            allowClear
+            onSearch={setKeyword}
+            onChange={(e) => { if (!e.target.value) setKeyword('') }}
+          />
+        </QueryFilterItem>
+      </QueryFilterPanel>
       <Table
         rowKey="feedbackId"
         columns={columns}

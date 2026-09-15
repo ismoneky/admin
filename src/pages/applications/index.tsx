@@ -12,6 +12,7 @@ import {
 import type { ColumnsType } from 'antd/es/table'
 import { getApplications, approveApplication, rejectApplication } from '../../api/applications'
 import type { Application, ApplicationStatus } from '../../types'
+import QueryFilterPanel, { QueryFilterItem } from '../../components/QueryFilterPanel'
 
 const statusOptions = [
   { label: '全部', value: '' },
@@ -154,15 +155,16 @@ export default function ApplicationsPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h2 style={{ margin: 0 }}>管理员申请</h2>
-        <Select
-          value={statusFilter}
-          onChange={setStatusFilter}
-          options={statusOptions}
-          style={{ width: 120 }}
-        />
-      </div>
+      <h2 style={{ margin: '0 0 16px' }}>管理员申请</h2>
+      <QueryFilterPanel columns={1} compact>
+        <QueryFilterItem label="申请状态" style={{ maxWidth: 240 }}>
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            options={statusOptions}
+          />
+        </QueryFilterItem>
+      </QueryFilterPanel>
 
       <Table
         rowKey="id"

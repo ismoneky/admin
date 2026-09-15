@@ -1,4 +1,26 @@
-import type { BookingStatus } from '../types'
+import type { BookingStatus, FreeReason, TimeSlot, TravelMode, VehicleType } from '../types'
+
+export const TIME_SLOT_MAP: Record<TimeSlot, string> = {
+  morning: '上午',
+  afternoon: '下午',
+}
+
+export const FREE_REASON_MAP: Record<Exclude<FreeReason, null>, { label: string; color: string }> = {
+  member: { label: '会员免费', color: 'gold' },
+  dailyQuota: { label: '每日免费', color: 'cyan' },
+  age: { label: '年龄免费', color: 'green' },
+}
+
+export const TRAVEL_MODE_MAP: Record<TravelMode, string> = {
+  scenicBus: '景区大巴',
+  selfDriving: '自驾',
+  tourGroup: '旅游团',
+}
+
+export const VEHICLE_TYPE_MAP: Record<VehicleType, { label: string; color: string }> = {
+  wheelMotorcycle: { label: '摩托车', color: 'volcano' },
+  smallCar: { label: '小客车', color: 'geekblue' },
+}
 
 /**
  * 订单状态（bookings.status）中文映射 —— 全站唯一来源。

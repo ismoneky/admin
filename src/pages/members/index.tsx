@@ -30,6 +30,10 @@ import {
   updateMember,
   deleteMember,
 } from '../../api/members'
+import QueryFilterPanel, {
+  QueryFilterActions,
+  QueryFilterItem,
+} from '../../components/QueryFilterPanel'
 
 const statusOptions = [
   { label: '全部', value: '' },
@@ -343,28 +347,30 @@ export default function MembersPage() {
       </div>
 
       {/* 搜索栏 */}
-      <Card size="small" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <QueryFilterPanel columns={2}>
+        <QueryFilterItem label="关键字" wide>
           <Input
             placeholder="搜索姓名/手机号/身份证号/车牌号"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onPressEnter={handleSearch}
-            style={{ width: 'min(300px, calc(100vw - 200px))', minWidth: 160 }}
             prefix={<SearchOutlined />}
             allowClear
           />
+        </QueryFilterItem>
+        <QueryFilterItem label="会员状态">
           <Select
             value={statusFilter}
             onChange={(val) => setStatusFilter(val)}
             options={statusOptions}
-            style={{ width: 120 }}
           />
+        </QueryFilterItem>
+        <QueryFilterActions className="query-filter-panel__actions--mobile-inline">
           <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
             查询
           </Button>
-        </div>
-      </Card>
+        </QueryFilterActions>
+      </QueryFilterPanel>
 
       {/* 表格 */}
       <Card styles={{ body: { padding: 0 } }}>

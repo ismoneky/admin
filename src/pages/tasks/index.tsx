@@ -101,17 +101,10 @@ export default function TasksPage() {
       <h2 style={{ margin: '0 0 16px' }}>定时任务</h2>
 
       <Alert
-        type="info"
+        type="warning"
         showIcon
         style={{ marginBottom: 16 }}
-        message="这两个任务平时由后端自动执行，这里只解决「不想等到点」"
-        description={
-          <span>
-            手动执行调的是后端定时任务<b>同一个方法</b>，不会绕过任何规则：下单不满 2 小时的静默期、
-            已发过消息的去重、单轮 200 条上限，照样生效——能改的只有执行时机。
-            积压的订单多时一轮消化不完，要连点几次。
-          </span>
-        }
+        message="这两个任务平时由后端自动执行，这里报漏的是手动执行过期订单的方法，请谨慎执行！！"
       />
 
       {/* ── 过期扫描（T1）──────────────────────────────────────────────── */}
@@ -119,7 +112,7 @@ export default function TasksPage() {
         title={
           <Space>
             <span>过期扫描</span>
-            <Tag color="blue">自动执行：每小时 :13</Tag>
+            <Tag color="blue">自动执行：每小时的 第13分钟开始执行</Tag>
           </Space>
         }
         style={{ marginBottom: 16 }}
@@ -187,18 +180,6 @@ export default function TasksPage() {
           一次扫描做两件事：① 给「今天已预约、还没核销」的用户发核销提醒；
           ② 给「近 7 天已过期、且没申请退款」的用户补发一条可退款提醒。
         </div>
-        <Alert
-          type="error"
-          showIcon
-          style={{ marginBottom: 16 }}
-          message="白天或凌晨执行会打扰用户，请只在测试环境用"
-          description={
-            <span>
-              ① 的文案是「今天快结束了，请尽快核销」——22:00 说这句话是提醒，
-              下午或凌晨说同一句话就是打扰。后端不会拦这个时机，靠操作的人自觉。
-            </span>
-          }
-        />
         <QuietWindowField value={dailyQuiet} onChange={setDailyQuiet} />
         <Popconfirm
           title="确认立刻执行一次每日提醒？"

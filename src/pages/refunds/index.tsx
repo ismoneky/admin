@@ -29,6 +29,10 @@ import type {
   RefundApplyStatus,
 } from '../../types'
 import { BOOKING_STATUS_MAP } from '../../constants/booking'
+import QueryFilterPanel, {
+  QueryFilterActions,
+  QueryFilterItem,
+} from '../../components/QueryFilterPanel'
 
 /**
  * 申请单状态 → 展示。
@@ -253,17 +257,17 @@ export default function RefundsPage() {
     <div>
       <h2 style={{ margin: '0 0 16px' }}>退款审核</h2>
 
-      <Form form={form} layout="inline" style={{ marginBottom: 16, rowGap: 8 }}>
-        <Form.Item name="status">
-          <Select placeholder="全部状态" options={STATUS_OPTIONS} style={{ width: 130 }} allowClear />
-        </Form.Item>
-        <Form.Item name="createdRange">
+      <QueryFilterPanel form={form} columns={3}>
+        <QueryFilterItem name="status" label="申请状态">
+          <Select placeholder="全部状态" options={STATUS_OPTIONS} allowClear />
+        </QueryFilterItem>
+        <QueryFilterItem name="createdRange" label="申请日期" wide>
           <DatePicker.RangePicker placeholder={['申请起始', '申请结束']} />
-        </Form.Item>
-        <Form.Item name="keyword">
-          <Input placeholder="申请单号 / 订单号" style={{ width: 200 }} allowClear />
-        </Form.Item>
-        <Form.Item>
+        </QueryFilterItem>
+        <QueryFilterItem name="keyword" label="关键字">
+          <Input placeholder="申请单号 / 订单号" allowClear />
+        </QueryFilterItem>
+        <QueryFilterActions>
           <Space>
             <Button type="primary" icon={<SearchOutlined />} onClick={handleSearch}>
               查询
@@ -272,8 +276,8 @@ export default function RefundsPage() {
               重置
             </Button>
           </Space>
-        </Form.Item>
-      </Form>
+        </QueryFilterActions>
+      </QueryFilterPanel>
 
       <Table
         rowKey="applyNo"
