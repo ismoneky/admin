@@ -28,6 +28,7 @@ export interface UpdateAnnouncementDto {
 export interface TimeSlotLimit {
   morningMaxPeople: number
   afternoonMaxPeople: number
+  quotaDisplayThresholdPercent?: number
 }
 
 export interface PaymentConfig {

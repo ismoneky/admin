@@ -52,6 +52,7 @@ export default function SystemConfigPage() {
           bookingDisabledMessage: config.bookingDisabledMessage,
           morningMaxPeople: timeSlotLimit?.morningMaxPeople ?? 100,
           afternoonMaxPeople: timeSlotLimit?.afternoonMaxPeople ?? 100,
+          quotaDisplayThresholdPercent: timeSlotLimit?.quotaDisplayThresholdPercent ?? 30,
           paymentAmount: paymentConfig?.paymentAmount ?? 0,
           freeQuotaEnabled: paymentConfig?.freeQuotaEnabled ?? false,
           freeQuotaLimit: paymentConfig?.freeQuotaLimit ?? 100,
@@ -77,6 +78,7 @@ export default function SystemConfigPage() {
       timeSlotLimit: {
         morningMaxPeople: values.morningMaxPeople,
         afternoonMaxPeople: 0,
+        quotaDisplayThresholdPercent: values.quotaDisplayThresholdPercent,
       },
       paymentConfig: {
         paymentAmount: values.paymentAmount,
@@ -95,6 +97,7 @@ export default function SystemConfigPage() {
     bookingDisabledMessage: string
     morningMaxPeople: number
     afternoonMaxPeople: number
+    quotaDisplayThresholdPercent: number
     paymentAmount: number
     freeQuotaEnabled: boolean
     freeQuotaLimit: number
@@ -110,6 +113,7 @@ export default function SystemConfigPage() {
         timeSlotLimit: {
           morningMaxPeople: values.morningMaxPeople,
           afternoonMaxPeople: 0,
+          quotaDisplayThresholdPercent: values.quotaDisplayThresholdPercent,
         },
         paymentConfig: {
           paymentAmount: values.paymentAmount,
@@ -257,6 +261,15 @@ export default function SystemConfigPage() {
         <Card title="时间段预约限制" style={{ marginBottom: 12, width: '100%' }} size="small">
           <Form.Item name="morningMaxPeople" label="最大预约单量" rules={[{ required: true, message: '请输入' }]} style={{ marginBottom: 12 }}>
             <InputNumber min={1} style={{ width: 160 }} addonAfter="人" />
+          </Form.Item>
+          <Form.Item
+            name="quotaDisplayThresholdPercent"
+            label="剩余名额展示阈值"
+            rules={[{ required: true, message: '请输入展示阈值' }]}
+            extra="剩余比例小于或等于该值时展示准确人数；100% 表示始终展示，0% 表示仅显示已满。"
+            style={{ marginBottom: 0 }}
+          >
+            <InputNumber min={0} max={100} precision={0} style={{ width: 160 }} addonAfter="%" />
           </Form.Item>
         </Card>
 
