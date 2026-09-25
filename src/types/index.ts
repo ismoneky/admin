@@ -28,7 +28,10 @@ export interface UpdateAnnouncementDto {
 export interface TimeSlotLimit {
   morningMaxPeople: number
   afternoonMaxPeople: number
+  /** 剩余比例低于该值时下发精确剩余单量 */
   quotaDisplayThresholdPercent?: number
+  /** 剩余比例低于该值时视为紧张，小程序用红色「仅剩」措辞 */
+  quotaAlertThresholdPercent?: number
 }
 
 export interface PaymentConfig {

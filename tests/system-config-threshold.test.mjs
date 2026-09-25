@@ -32,6 +32,20 @@ test('system config renders a percentage control for the remaining-quota display
     assert.match(html, /aria-valuemin="0"/)
     assert.match(html, /aria-valuemax="100"/)
     assert.match(html, />%<\/div>/)
+
+    // 展示阈值管「要不要给数字」，紧张阈值管「给了数字要不要报警」。
+    // 两者必须同时存在，否则运营调高展示阈值会把整个页面变成红色「仅剩」
+    assert.match(html, />名额紧张阈值</)
+    assert.match(html, /id="quotaAlertThresholdPercent"/)
+    assert.equal(
+      (html.match(/id="quota(Display|Alert)ThresholdPercent"/g) || []).length,
+      2,
+      '两个阈值控件都必须渲染',
+    )
+
+    // 容量口径是【单】不是【人】，单位后缀不能再说「人」
+    assert.match(html, />单<\/div>/)
+    assert.doesNotMatch(html, /addonAfter[^>]*人|>人<\/div>/)
   } finally {
     await bundle.close()
     await fsPromises.rm(tempDir, { recursive: true, force: true })
