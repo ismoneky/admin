@@ -33,6 +33,7 @@ import QueryFilterPanel, {
   QueryFilterActions,
   QueryFilterItem,
 } from '../../components/QueryFilterPanel'
+import AutoHeightTable from '../../components/AutoHeightTable'
 
 /**
  * 申请单状态 → 展示。
@@ -279,13 +280,14 @@ export default function RefundsPage() {
         </QueryFilterActions>
       </QueryFilterPanel>
 
-      <Table
+      <AutoHeightTable
         rowKey="applyNo"
         columns={columns}
         dataSource={data}
         loading={loading}
-        scroll={{ x: 1200, y: 'calc(100vh - 470px)' }}
+        scroll={{ x: 1200 }}
         pagination={{
+          placement: ['bottomCenter'],
           current: pagination.page,
           pageSize: pagination.pageSize,
           total: pagination.total,

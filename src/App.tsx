@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ConfigProvider, App as AntApp } from "antd";
-import zhCN from "antd/locale/zh_CN";
+import zhCN from "antd/es/locale/zh_CN";
 import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import AuthGuard from "./components/AuthGuard";
@@ -35,9 +35,15 @@ function Beian() {
         fontSize: 12,
         color: '#999',
         zIndex: 100,
+        pointerEvents: 'none',
       }}
     >
-      <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer" style={{ color: '#999' }}>
+      <a
+        href="https://beian.miit.gov.cn"
+        target="_blank"
+        rel="noreferrer"
+        style={{ color: '#999', pointerEvents: 'auto' }}
+      >
         豫ICP备2026013379号-1
       </a>
     </div>

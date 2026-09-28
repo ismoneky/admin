@@ -1,0 +1,16 @@
+.auto-height-table .ant-table-body {
+  height: var(--auto-height-table-body-height);
+  max-height: var(--auto-height-table-body-height) !important;
+}
+
+.auto-height-table .ant-table-pagination.ant-pagination {
+  margin-block: 12px 0;
+  justify-content: center;
+}
+
+@media (max-width: 575px) {
+  .auto-height-table .ant-table-pagination.ant-pagination {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+}

@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
-  Table,
   Form,
   Input,
   Select,
@@ -26,6 +25,7 @@ import QueryFilterPanel, {
   QueryFilterActions,
   QueryFilterItem,
 } from '../../components/QueryFilterPanel'
+import AutoHeightTable from '../../components/AutoHeightTable'
 import OrderDetailDrawer from './components/OrderDetailDrawer'
 
 export default function OrdersPage() {
@@ -87,6 +87,12 @@ export default function OrdersPage() {
     setCurrentRecord(record)
     setDetailVisible(true)
   }
+
+  const handleRefunded = useCallback(async () => {
+    setDetailVisible(false)
+    setCurrentRecord(null)
+    await fetchData(queryParams)
+  }, [fetchData, queryParams])
 
   const handleExport = async () => {
     message.loading({ content: '正在导出...', key: 'export' })
@@ -274,13 +280,14 @@ export default function OrdersPage() {
         </QueryFilterActions>
       </QueryFilterPanel>
 
-      <Table
+      <AutoHeightTable
         rowKey="id"
         columns={columns}
         dataSource={data}
         loading={loading}
-        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
+        scroll={{ x: 900 }}
         pagination={{
+          placement: ['bottomCenter'],
           current: pagination.page,
           pageSize: pagination.pageSize,
           total: pagination.total,
@@ -294,6 +301,7 @@ export default function OrdersPage() {
         open={detailVisible}
         record={currentRecord}
         onClose={() => setDetailVisible(false)}
+        onRefunded={handleRefunded}
       />
     </>
   )

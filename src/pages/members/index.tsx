@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
 import {
-  Table,
   Button,
   Space,
   Select,
@@ -34,6 +33,7 @@ import QueryFilterPanel, {
   QueryFilterActions,
   QueryFilterItem,
 } from '../../components/QueryFilterPanel'
+import AutoHeightTable from '../../components/AutoHeightTable'
 
 const statusOptions = [
   { label: '全部', value: '' },
@@ -374,13 +374,14 @@ export default function MembersPage() {
 
       {/* 表格 */}
       <Card styles={{ body: { padding: 0 } }}>
-        <Table
+        <AutoHeightTable
           rowKey="id"
           columns={columns}
           dataSource={data}
           loading={loading}
-          scroll={{ x: 1400, y: 'calc(100vh - 360px)' }}
+          scroll={{ x: 1400 }}
           pagination={{
+            placement: ['bottomCenter'],
             current: pagination.page,
             pageSize: pagination.pageSize,
             total: pagination.total,

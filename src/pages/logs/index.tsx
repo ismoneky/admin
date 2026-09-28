@@ -12,7 +12,6 @@ import {
   Select,
   Space,
   Statistic,
-  Table,
   Tag,
   Tooltip,
 } from 'antd'
@@ -21,6 +20,7 @@ import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { getLogStats, queryLogs } from '../../api/logs'
 import type { AppLog, LogCategory, LogLevel, LogQueryParams, LogSource, LogStats } from '../../types'
+import AutoHeightTable from '../../components/AutoHeightTable'
 
 /**
  * 日志查询（`GET /admin/logs`）
@@ -308,7 +308,7 @@ export default function LogsPage() {
         </Form.Item>
       </Form>
 
-      <Table
+      <AutoHeightTable
         rowKey="id"
         columns={columns}
         dataSource={data}
@@ -316,6 +316,7 @@ export default function LogsPage() {
         scroll={{ x: 900 }}
         expandable={{ expandedRowRender }}
         pagination={{
+          placement: ['bottomCenter'],
           current: pagination.page,
           pageSize: pagination.pageSize,
           total: pagination.total,

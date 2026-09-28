@@ -199,8 +199,12 @@ export default function MainLayout() {
           </Dropdown>
         </Header>
 
-        <Content style={{ margin: isMobile ? '12px 12px 24px' : '24px 24px 60px' }}>
+        <Content
+          className="main-layout__content"
+          style={{ margin: isMobile ? '12px 12px 24px' : '24px 24px 60px' }}
+        >
           <div
+            className="main-layout__content-body"
             style={{
               padding: isMobile ? 12 : 24,
               background: colorBgContainer,

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import {
-  Table,
   Button,
   Space,
   Switch,
@@ -21,6 +20,7 @@ import {
   updateAnnouncement,
   deleteAnnouncement,
 } from '../../api/announcements'
+import AutoHeightTable from '../../components/AutoHeightTable'
 
 const { TextArea } = Input
 
@@ -164,7 +164,7 @@ export default function AnnouncementsPage() {
   ]
 
   return (
-    <div className='content'>
+    <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <h2 style={{ margin: 0 }}>公告管理</h2>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
@@ -172,14 +172,17 @@ export default function AnnouncementsPage() {
         </Button>
       </div>
 
-      <Table
-        className='table'
+      <AutoHeightTable
         rowKey="id"
         columns={columns}
         dataSource={data}
         loading={loading}
-        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
-        pagination={{ pageSize: 10, showTotal: (t) => `共 ${t} 条` }}
+        scroll={{ x: 900 }}
+        pagination={{
+          placement: ['bottomCenter'],
+          pageSize: 10,
+          showTotal: (t) => `共 ${t} 条`,
+        }}
       />
 
       <Modal

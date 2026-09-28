@@ -16,11 +16,18 @@ body {
   min-height: 100vh;
 }
 
-.ant-layout-content > div {
-  height: 100%;
+.main-layout__content {
+  min-height: 0;
+  overflow: hidden;
 }
-.content {
+
+.main-layout__content-body {
   height: 100%;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 /* 表头浅灰色 */
@@ -28,36 +35,3 @@ body {
 .ant-table-thead > tr > td {
   background-color: #f5f5f5 !important;
 }
-/* 
-.ant-table-wrapper {
-  position: relative;
-  height: calc(100% - 50px);
-  padding-bottom: 50px;
-  box-sizing: border-box;
-}
-
-.ant-spin, .ant-spin-container {
-  height: 100%;
-}
-
-.ant-table-wrapper .ant-table {
-  height: 100%;
-}
-
-.ant-table-wrapper .ant-table-container {
-  height: 100%;
-}
-
-.ant-table-wrapper .ant-table-body {
-  flex: 1;
-  overflow-y: auto !important;
-}
-
-.ant-table-wrapper .ant-pagination {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  margin: 0 !important;
-  white-space: nowrap;
-} */

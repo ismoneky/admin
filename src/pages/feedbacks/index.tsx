@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Table, Input, Modal, Descriptions, Button } from 'antd'
+import { Input, Modal, Descriptions, Button } from 'antd'
 import { EyeOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import { getFeedbacks } from '../../api/feedbacks'
 import type { Feedback } from '../../types'
 import QueryFilterPanel, { QueryFilterItem } from '../../components/QueryFilterPanel'
+import AutoHeightTable from '../../components/AutoHeightTable'
 
 export default function FeedbacksPage() {
   const [list, setList] = useState<Feedback[]>([])
@@ -77,13 +78,17 @@ export default function FeedbacksPage() {
           />
         </QueryFilterItem>
       </QueryFilterPanel>
-      <Table
+      <AutoHeightTable
         rowKey="feedbackId"
         columns={columns}
         dataSource={filtered}
         loading={loading}
-        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
-        pagination={{ pageSize: 20, showTotal: (total) => `共 ${total} 条` }}
+        scroll={{ x: 900 }}
+        pagination={{
+          placement: ['bottomCenter'],
+          pageSize: 20,
+          showTotal: (total) => `共 ${total} 条`,
+        }}
       />
 
       <Modal

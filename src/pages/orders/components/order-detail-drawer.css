@@ -15,6 +15,57 @@
   color: #66727d;
 }
 
+.order-detail-drawer .ant-drawer-footer {
+  padding: 14px 24px calc(14px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--detail-line);
+  background: #fff;
+}
+
+.order-detail-refund-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.order-detail-refund-footer span {
+  color: var(--detail-muted);
+  font-size: 13px;
+}
+
+.order-refund-confirmation {
+  padding-top: 8px;
+}
+
+.order-refund-confirmation dl {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #f7f9fb;
+}
+
+.order-refund-confirmation dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.order-refund-confirmation dl > div + div {
+  margin-top: 10px;
+}
+
+.order-refund-confirmation dt {
+  color: #7b8794;
+}
+
+.order-refund-confirmation dd {
+  margin: 0;
+  color: #1f2933;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+
 .order-detail-drawer__title {
   display: flex;
   flex-direction: column;
@@ -312,6 +363,16 @@
 @media (max-width: 640px) {
   .order-detail-drawer .ant-drawer-header {
     padding: 15px 16px;
+  }
+
+  .order-detail-drawer .ant-drawer-footer {
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .order-detail-refund-footer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .order-detail-content {

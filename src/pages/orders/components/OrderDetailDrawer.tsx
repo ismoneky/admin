@@ -1,14 +1,17 @@
+import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { Drawer, Tag, Typography } from 'antd'
+import { Alert, Button, Drawer, Form, Input, Modal, Tag, Typography, message } from 'antd'
 import {
   CalendarOutlined,
   CarOutlined,
   ClockCircleOutlined,
   TeamOutlined,
   UserOutlined,
+  WarningOutlined,
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import type { Booking, Passenger } from '../../../types'
+import { refundBookingAsAdmin } from '../../../api/bookings'
 import {
   BOOKING_STATUS_MAP,
   FREE_REASON_MAP,
@@ -28,6 +31,7 @@ interface OrderDetailDrawerProps {
   open: boolean
   record: Booking | null
   onClose: () => void
+  onRefunded: () => void | Promise<void>
 }
 
 interface OrderDetailContentProps {
@@ -72,6 +76,16 @@ function formatDateTime(value: string | null | undefined): string {
 function formatAmount(record: Booking): string {
   if (record.isFree) return '¥0.00'
   return record.amount == null ? '—' : `¥${(record.amount / 100).toFixed(2)}`
+}
+
+function canAdminRefundBooking(record: Booking | null): record is Booking {
+  return Boolean(
+    record
+    && (record.status === 'confirmed' || record.status === 'completed')
+    && record.paymentStatus === 'paid'
+    && !record.isFree
+    && (record.refundStatus === 'none' || record.refundStatus === 'failed'),
+  )
 }
 
 function DetailSection({ title, icon, meta, children }: DetailSectionProps) {
@@ -254,24 +268,117 @@ export function OrderDetailContent({ record }: OrderDetailContentProps) {
   )
 }
 
-export default function OrderDetailDrawer({ open, record, onClose }: OrderDetailDrawerProps) {
+export default function OrderDetailDrawer({ open, record, onClose, onRefunded }: OrderDetailDrawerProps) {
+  const [refundForm] = Form.useForm<{ secondaryPassword: string }>()
+  const [refundModalOpen, setRefundModalOpen] = useState(false)
+  const [refundSubmitting, setRefundSubmitting] = useState(false)
+  const refundable = canAdminRefundBooking(record)
+
+  const closeRefundModal = () => {
+    if (refundSubmitting) return
+    setRefundModalOpen(false)
+    refundForm.resetFields()
+  }
+
+  const closeDrawer = () => {
+    closeRefundModal()
+    onClose()
+  }
+
+  const submitRefund = async () => {
+    if (!record || !refundable) return
+    const { secondaryPassword } = await refundForm.validateFields()
+    setRefundSubmitting(true)
+    try {
+      await refundBookingAsAdmin(record.bookingId, secondaryPassword)
+      message.success('退款申请已提交，系统将等待微信退款结果')
+      setRefundModalOpen(false)
+      refundForm.resetFields()
+      await onRefunded()
+    } catch {
+      refundForm.setFieldValue('secondaryPassword', '')
+    } finally {
+      setRefundSubmitting(false)
+    }
+  }
+
   return (
-    <Drawer
-      className="order-detail-drawer"
-      title={(
-        <div className="order-detail-drawer__title">
-          <strong>订单详情</strong>
-          <span>预约、人员与订单记录</span>
-        </div>
-      )}
-      placement="right"
-      width="min(820px, 100vw)"
-      open={open}
-      onClose={onClose}
-      destroyOnHidden
-      styles={DRAWER_STYLES}
-    >
-      {record ? <OrderDetailContent record={record} /> : null}
-    </Drawer>
+    <>
+      <Drawer
+        className="order-detail-drawer"
+        title={(
+          <div className="order-detail-drawer__title">
+            <strong>订单详情</strong>
+            <span>预约、人员与订单记录</span>
+          </div>
+        )}
+        placement="right"
+        width="min(820px, 100vw)"
+        open={open}
+        onClose={closeDrawer}
+        destroyOnHidden
+        styles={DRAWER_STYLES}
+        footer={refundable ? (
+          <div className="order-detail-refund-footer">
+            <span>该订单已支付，可由管理员发起全额退款。</span>
+            <Button type="primary" danger onClick={() => setRefundModalOpen(true)}>
+              退款
+            </Button>
+          </div>
+        ) : undefined}
+      >
+        {record ? <OrderDetailContent record={record} /> : null}
+      </Drawer>
+
+      <Modal
+        title="确认退款"
+        open={refundModalOpen}
+        okText="确认退款"
+        cancelText="取消"
+        okButtonProps={{ danger: true }}
+        confirmLoading={refundSubmitting}
+        closable={!refundSubmitting}
+        maskClosable={!refundSubmitting}
+        onOk={() => void submitRefund()}
+        onCancel={closeRefundModal}
+        afterClose={() => refundForm.resetFields()}
+        destroyOnHidden
+      >
+        {record ? (
+          <div className="order-refund-confirmation">
+            <Alert
+              type="warning"
+              showIcon
+              icon={<WarningOutlined />}
+              message="这是资金操作，提交后将向微信发起全额退款"
+            />
+            <dl>
+              <div>
+                <dt>订单号</dt>
+                <dd>{record.bookingId}</dd>
+              </div>
+              <div>
+                <dt>退款金额</dt>
+                <dd>{formatAmount(record)}</dd>
+              </div>
+            </dl>
+            <Form form={refundForm} layout="vertical" preserve={false}>
+              <Form.Item
+                name="secondaryPassword"
+                label="退款二级密码"
+                rules={[{ required: true, message: '请输入退款二级密码' }]}
+              >
+                <Input.Password
+                  autoComplete="new-password"
+                  maxLength={128}
+                  placeholder="请输入独立退款密码"
+                  onPressEnter={() => void submitRefund()}
+                />
+              </Form.Item>
+            </Form>
+          </div>
+        ) : null}
+      </Modal>
+    </>
   )
 }

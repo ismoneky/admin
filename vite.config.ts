@@ -9,11 +9,10 @@ export default defineConfig({
         target: 'https://www.hbfctl.com.cn/',
         changeOrigin: true,
       },
-      // '/api': {
-      //   target: 'https://www.hbfctl.com.cn',
-      //   changeOrigin: true,
-      // },
-      
+      '/api': {
+        target: 'https://www.hbfctl.com.cn',
+        changeOrigin: true,
+      },
     },
   },
 })

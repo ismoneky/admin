@@ -85,6 +85,9 @@ export type BookingStatus =
   // 预约日已过且未核销。后端 2026-09-13 起由 T1 扫描写入（此前会被刷成 completed）
   | 'expired'
 
+export type PaymentStatus = 'unpaid' | 'paying' | 'paid' | 'refunding' | 'refunded' | 'failed'
+export type RefundStatus = 'none' | 'refunding' | 'refunded' | 'failed'
+
 export type PassengerType = 'adult' | 'child' | 'senior'
 
 export type PassengerPricingReason =
@@ -130,6 +133,8 @@ export interface Booking {
   personCount: number
   remarks?: string
   status: BookingStatus
+  paymentStatus: PaymentStatus
+  refundStatus: RefundStatus
   isFree?: boolean
   freeReason?: FreeReason
   amount?: number | null
