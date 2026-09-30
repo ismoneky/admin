@@ -1,93 +1,30 @@
-import { Layout, Menu, Avatar, Dropdown, theme, Drawer, Button, Grid } from 'antd'
-import {
-  DashboardOutlined,
-  NotificationOutlined,
-  SettingOutlined,
-  OrderedListOutlined,
-  UserOutlined,
-  LogoutOutlined,
-  SolutionOutlined,
-  MessageOutlined,
-  CrownOutlined,
-  DollarOutlined,
-  MenuOutlined,
-  SendOutlined,
-  FieldTimeOutlined,
-  FileSearchOutlined,
-} from '@ant-design/icons'
+import { Layout, Menu, Drawer, Button, Grid } from 'antd'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuthStore } from '../stores/authStore'
+import BeianFooter from '../components/BeianFooter'
+import './main-layout.css'
 
-const { Header, Sider, Content } = Layout
+const { Sider, Content } = Layout
 
 const menuItems = [
-  {
-    key: '/dashboard',
-    icon: <DashboardOutlined />,
-    label: '经营统计',
-  },
-  {
-    key: '/announcements',
-    icon: <NotificationOutlined />,
-    label: '公告管理',
-  },
-  {
-    key: '/system-config',
-    icon: <SettingOutlined />,
-    label: '系统配置',
-  },
-  {
-    key: '/orders',
-    icon: <OrderedListOutlined />,
-    label: '订单查询',
-  },
-  {
-    key: '/refunds',
-    icon: <DollarOutlined />,
-    label: '退款审核',
-  },
-  {
-    key: '/applications',
-    icon: <SolutionOutlined />,
-    label: '管理员申请',
-  },
-  {
-    key: '/feedbacks',
-    icon: <MessageOutlined />,
-    label: '反馈统计',
-  },
-  {
-    key: '/members',
-    icon: <CrownOutlined />,
-    label: '月卡会员',
-  },
-  {
-    // 与「反馈统计」的 MessageOutlined 区分：这里用的是发送语义的图标
-    key: '/messages',
-    icon: <SendOutlined />,
-    label: '发送消息',
-  },
-  {
-    // 手动触发后端定时任务，运维/测试用；有真实副作用，页面里每个按钮都套了二次确认
-    key: '/tasks',
-    icon: <FieldTimeOutlined />,
-    label: '定时任务',
-  },
-  {
-    // 结构化业务日志（logs.db，保留 30 天）；不含后端 stdout 日志，页面顶部写明了
-    key: '/logs',
-    icon: <FileSearchOutlined />,
-    label: '日志查询',
-  },
+  { key: '/dashboard', label: '经营统计' },
+  { key: '/announcements', label: '公告管理' },
+  { key: '/system-config', label: '系统配置' },
+  { key: '/orders', label: '订单查询' },
+  { key: '/refunds', label: '退款审核' },
+  { key: '/applications', label: '管理员申请' },
+  { key: '/feedbacks', label: '反馈统计' },
+  { key: '/members', label: '月卡会员' },
+  { key: '/messages', label: '发送消息' },
+  { key: '/tasks', label: '定时任务' },
+  { key: '/logs', label: '日志查询' },
 ]
 
 export default function MainLayout() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { name, logout } = useAuthStore()
-  const { token: { colorBgContainer, borderRadiusLG } } = theme.useToken()
-  // md 断点（768px）以下走移动端布局：无 Sider，导航收进抽屉
+  const logout = useAuthStore((state) => state.logout)
   const screens = Grid.useBreakpoint()
   const isMobile = !screens.md
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -102,118 +39,72 @@ export default function MainLayout() {
     navigate('/login')
   }
 
-  const userMenuItems = [
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: '退出登录',
-      onClick: handleLogout,
-    },
-  ]
-
-  const brandTitle = (
-    <div
-      style={{
-        height: 64,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 600,
-        borderBottom: '1px solid rgba(255,255,255,0.1)',
-      }}
-    >
-      后台管理系统
-    </div>
-  )
-
-  return (
-    <Layout style={{ minHeight: '100vh' }}>
-      {!isMobile && (
-        <Sider
-          theme="dark"
-          width={200}
-          style={{ position: 'fixed', height: '100vh', left: 0, top: 0, bottom: 0 }}
-        >
-          {brandTitle}
-          <Menu
-            theme="dark"
-            mode="inline"
-            selectedKeys={[location.pathname]}
-            items={menuItems}
-            onClick={handleMenuClick}
-            style={{ marginTop: 8 }}
-          />
-        </Sider>
-      )}
-
-      {/* 移动端抽屉导航 */}
-      <Drawer
-        placement="left"
-        open={isMobile && drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        width={220}
-        styles={{ body: { padding: 0, background: '#001529' } }}
-        closable={false}
-      >
-        {brandTitle}
+  const navigation = (
+    <div className="main-layout__navigation">
+      <div className="main-layout__brand">
+        <span>后台管理系统</span>
+        {isMobile && (
+          <Button type="text" onClick={() => setDrawerOpen(false)}>
+            关闭
+          </Button>
+        )}
+      </div>
+      <nav className="main-layout__menu" aria-label="后台导航">
         <Menu
           theme="dark"
           mode="inline"
           selectedKeys={[location.pathname]}
           items={menuItems}
           onClick={handleMenuClick}
-          style={{ marginTop: 8 }}
         />
+      </nav>
+      <div className="main-layout__logout">
+        <Button type="text" block onClick={handleLogout}>
+          退出登录
+        </Button>
+      </div>
+    </div>
+  )
+
+  return (
+    <Layout className="main-layout">
+      {!isMobile && (
+        <Sider theme="dark" width={200} className="main-layout__sidebar">
+          {navigation}
+        </Sider>
+      )}
+
+      <Drawer
+        placement="left"
+        open={isMobile && drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        size={240}
+        styles={{ body: { padding: 0, background: '#001529' } }}
+        closable={false}
+      >
+        {navigation}
       </Drawer>
 
-      <Layout style={{ marginLeft: isMobile ? 0 : 200, height: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <Header
-          style={{
-            padding: isMobile ? '0 12px' : '0 24px',
-            background: colorBgContainer,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-            position: 'sticky',
-            top: 0,
-            zIndex: 10,
-          }}
-        >
-          {isMobile ? (
+      <Layout className="main-layout__workspace">
+        {isMobile && (
+          <div className="main-layout__mobile-bar">
+            <span>后台管理系统</span>
             <Button
-              type="text"
-              icon={<MenuOutlined />}
+              size="small"
+              aria-label="打开导航菜单"
+              aria-expanded={drawerOpen}
               onClick={() => setDrawerOpen(true)}
-            />
-          ) : (
-            <span />
-          )}
-          <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Avatar size="small" icon={<UserOutlined />} />
-              <span>{name}</span>
-            </div>
-          </Dropdown>
-        </Header>
-
-        <Content
-          className="main-layout__content"
-          style={{ margin: isMobile ? '12px 12px 24px' : '24px 24px 60px' }}
-        >
-          <div
-            className="main-layout__content-body"
-            style={{
-              padding: isMobile ? 12 : 24,
-              background: colorBgContainer,
-              borderRadius: borderRadiusLG,
-            }}
-          >
+            >
+              菜单
+            </Button>
+          </div>
+        )}
+        <Content className="main-layout__content">
+          <div className="main-layout__content-body">
             <Outlet />
           </div>
         </Content>
+        <BeianFooter />
       </Layout>
     </Layout>
   )

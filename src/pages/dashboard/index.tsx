@@ -92,7 +92,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div style={{height: '82vh', overflow: 'hidden', overflowY: 'auto'}}>
+    <div>
       <Space direction="vertical" size={16} style={{ width: '100%' }}>
         <Space wrap>
           <Radio.Group value={preset} onChange={(e) => applyPreset(e.target.value as Preset)}>

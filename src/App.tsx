@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ConfigProvider, App as AntApp } from "antd";
 import zhCN from "antd/es/locale/zh_CN";
 import dayjs from "dayjs";
@@ -19,36 +19,6 @@ import TasksPage from "./pages/tasks";
 import LogsPage from "./pages/logs";
 
 dayjs.locale("zh-cn");
-
-function Beian() {
-  const location = useLocation()
-  const isLogin = location.pathname === '/login'
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: 0,
-        left: isLogin ? 0 : 200,
-        right: 0,
-        textAlign: 'center',
-        padding: '8px 24px',
-        fontSize: 12,
-        color: '#999',
-        zIndex: 100,
-        pointerEvents: 'none',
-      }}
-    >
-      <a
-        href="https://beian.miit.gov.cn"
-        target="_blank"
-        rel="noreferrer"
-        style={{ color: '#999', pointerEvents: 'auto' }}
-      >
-        豫ICP备2026013379号-1
-      </a>
-    </div>
-  )
-}
 
 export default function App() {
   return (
@@ -79,7 +49,6 @@ export default function App() {
               <Route path="logs" element={<LogsPage />} />
             </Route>
           </Routes>
-          <Beian />
         </BrowserRouter>
       </AntApp>
     </ConfigProvider>

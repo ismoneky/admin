@@ -20,16 +20,6 @@ export interface AutoHeightTableProps<RecordType extends object>
   minBodyHeight?: number
 }
 
-function blockSizeWithMargins(element: HTMLElement | null) {
-  if (!element) return 0
-
-  const style = window.getComputedStyle(element)
-  const marginTop = Number.parseFloat(style.marginTop) || 0
-  const marginBottom = Number.parseFloat(style.marginBottom) || 0
-
-  return element.getBoundingClientRect().height + marginTop + marginBottom
-}
-
 export default function AutoHeightTable<RecordType extends object>({
   minBodyHeight = DEFAULT_MIN_BODY_HEIGHT,
   scroll,
@@ -42,17 +32,25 @@ export default function AutoHeightTable<RecordType extends object>({
   const measure = useCallback(() => {
     const host = hostRef.current
     const viewport = host?.closest<HTMLElement>('.main-layout__content-body')
+    const body = host?.querySelector<HTMLElement>('.ant-table-body')
 
-    if (!host || !viewport) return
+    if (!host || !viewport || !body) return
 
     const viewportRect = viewport.getBoundingClientRect()
     const viewportStyle = window.getComputedStyle(viewport)
     const viewportPaddingBottom = Number.parseFloat(viewportStyle.paddingBottom) || 0
-    const hostTop = host.getBoundingClientRect().top
-    const header = host.querySelector<HTMLElement>('.ant-table-header')
-    const pagination = host.querySelector<HTMLElement>('.ant-table-pagination')
-    const availableTableHeight = viewportRect.bottom - viewportPaddingBottom - hostTop
-    const chromeHeight = blockSizeWithMargins(header) + blockSizeWithMargins(pagination)
+    let wrapperBottomSpace = 0
+    for (let parent = host.parentElement; parent && parent !== viewport; parent = parent.parentElement) {
+      const style = window.getComputedStyle(parent)
+      wrapperBottomSpace += (Number.parseFloat(style.paddingBottom) || 0)
+        + (Number.parseFloat(style.borderBottomWidth) || 0)
+        + (Number.parseFloat(style.marginBottom) || 0)
+    }
+    const hostRect = host.getBoundingClientRect()
+    const hostTop = hostRect.top + viewport.scrollTop
+    const availableTableHeight = viewportRect.bottom - viewportPaddingBottom - wrapperBottomSpace - hostTop
+    // Include borders, header and pagination spacing in the measured table height.
+    const chromeHeight = hostRect.height - body.getBoundingClientRect().height
     const nextBodyHeight = Math.max(
       minBodyHeight,
       Math.floor(availableTableHeight - chromeHeight),

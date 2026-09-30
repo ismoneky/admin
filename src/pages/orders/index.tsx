@@ -8,9 +8,10 @@ import {
   Space,
   Tag,
   Tooltip,
+  Grid,
   message,
 } from 'antd'
-import { SearchOutlined, ReloadOutlined, ExportOutlined, EyeOutlined } from '@ant-design/icons'
+import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
 import type { ColumnsType } from 'antd/es/table'
 import dayjs from 'dayjs'
 import { getBookings, exportBookings } from '../../api/bookings'
@@ -30,6 +31,7 @@ import OrderDetailDrawer from './components/OrderDetailDrawer'
 
 export default function OrdersPage() {
   const [form] = Form.useForm()
+  const screens = Grid.useBreakpoint()
   const [data, setData] = useState<Booking[]>([])
   const [loading, setLoading] = useState(false)
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10, total: 0 })
@@ -120,16 +122,19 @@ export default function OrdersPage() {
       title: '姓名',
       dataIndex: 'name',
       width: 90,
+      fixed: screens.md ? 'left' : undefined,
     },
     {
       title: '手机号',
       dataIndex: 'phone',
       width: 130,
+      fixed: screens.md ? 'left' : undefined,
     },
     {
       title: '预约日期',
       dataIndex: 'bookingDate',
       width: 120,
+      fixed: screens.md ? 'left' : undefined,
     },
     {
       title: '时间段',
@@ -226,11 +231,11 @@ export default function OrdersPage() {
     {
       title: '操作',
       width: 80,
+      fixed: screens.md ? 'right' : undefined,
       render: (_, record) => (
         <Button
           type="link"
           size="small"
-          icon={<EyeOutlined />}
           onClick={() => handleViewDetail(record)}
         >
           详情
@@ -243,7 +248,7 @@ export default function OrdersPage() {
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
         <h2 style={{ margin: 0 }}>订单查询</h2>
-        <Button icon={<ExportOutlined />} onClick={handleExport}>
+        <Button onClick={handleExport}>
           导出 Excel
         </Button>
       </div>

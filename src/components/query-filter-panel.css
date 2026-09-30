@@ -44,7 +44,7 @@
 .query-filter-panel .ant-select-selector,
 .query-filter-panel .ant-input-affix-wrapper,
 .query-filter-panel .ant-form-item-control-input-content > .ant-input,
-.query-filter-panel .ant-input-search .ant-input,
+.query-filter-panel .ant-input-search > .ant-input,
 .query-filter-panel .ant-btn {
   min-height: 36px;
 }
@@ -113,7 +113,7 @@
   .query-filter-panel .ant-select-selector,
   .query-filter-panel .ant-input-affix-wrapper,
   .query-filter-panel .ant-form-item-control-input-content > .ant-input,
-  .query-filter-panel .ant-input-search .ant-input,
+  .query-filter-panel .ant-input-search > .ant-input,
   .query-filter-panel .ant-btn {
     min-height: 34px;
   }

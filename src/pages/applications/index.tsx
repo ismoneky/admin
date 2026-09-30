@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import {
-  Table,
   Tag,
   Button,
   Space,
@@ -13,6 +12,7 @@ import type { ColumnsType } from 'antd/es/table'
 import { getApplications, approveApplication, rejectApplication } from '../../api/applications'
 import type { Application, ApplicationStatus } from '../../types'
 import QueryFilterPanel, { QueryFilterItem } from '../../components/QueryFilterPanel'
+import AutoHeightTable from '../../components/AutoHeightTable'
 
 const statusOptions = [
   { label: '全部', value: '' },
@@ -166,13 +166,13 @@ export default function ApplicationsPage() {
         </QueryFilterItem>
       </QueryFilterPanel>
 
-      <Table
+      <AutoHeightTable
         rowKey="id"
         columns={columns}
         dataSource={list}
         loading={loading}
         pagination={false}
-        scroll={{ x: 900, y: 'calc(100vh - 390px)' }}
+        scroll={{ x: 900 }}
       />
 
       <Modal

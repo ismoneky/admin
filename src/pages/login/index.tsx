@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { adminLogin } from '../../api/admin'
 import { useAuthStore } from '../../stores/authStore'
+import BeianFooter from '../../components/BeianFooter'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -26,15 +27,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      }}
-    >
+    <div className="login-page">
+      <main className="login-page__main">
       <Card
         style={{
           width: 'min(400px, calc(100vw - 32px))',
@@ -59,6 +53,8 @@ export default function LoginPage() {
           </Form.Item>
         </Form>
       </Card>
+      </main>
+      <BeianFooter />
     </div>
   )
 }
