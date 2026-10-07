@@ -11,6 +11,7 @@ const menuItems = [
   { key: '/dashboard', label: '经营统计' },
   { key: '/announcements', label: '公告管理' },
   { key: '/system-config', label: '系统配置' },
+  { key: '/scenic-guide', label: '景区导览' },
   { key: '/orders', label: '订单查询' },
   { key: '/refunds', label: '退款审核' },
   { key: '/applications', label: '管理员申请' },
@@ -30,11 +31,13 @@ export default function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const handleMenuClick = ({ key }: { key: string }) => {
+    if (key !== location.pathname && !window.dispatchEvent(new Event('scenic-guide:before-leave', { cancelable: true }))) return
     navigate(key)
     setDrawerOpen(false)
   }
 
   const handleLogout = () => {
+    if (!window.dispatchEvent(new Event('scenic-guide:before-leave', { cancelable: true }))) return
     logout()
     navigate('/login')
   }

@@ -17,10 +17,16 @@ import MembersPage from "./pages/members";
 import MessagesPage from "./pages/messages";
 import TasksPage from "./pages/tasks";
 import LogsPage from "./pages/logs";
+import ScenicGuidePage from "./pages/scenic-guide";
+import { lazy, Suspense } from 'react';
+
+const GuideDemo = import.meta.env.DEV && import.meta.env.MODE === 'guide-demo'
+  ? lazy(() => import('./pages/scenic-guide/GuideDemo')) : null;
 
 dayjs.locale("zh-cn");
 
 export default function App() {
+  if (GuideDemo) return <ConfigProvider locale={zhCN}><AntApp><Suspense fallback={<p>正在打开本地演示…</p>}><GuideDemo /></Suspense></AntApp></ConfigProvider>;
   return (
     <ConfigProvider locale={zhCN}>
       <AntApp>
@@ -39,6 +45,7 @@ export default function App() {
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="announcements" element={<AnnouncementsPage />} />
               <Route path="system-config" element={<SystemConfigPage />} />
+              <Route path="scenic-guide" element={<ScenicGuidePage />} />
               <Route path="orders" element={<OrdersPage />} />
               <Route path="refunds" element={<RefundsPage />} />
               <Route path="applications" element={<ApplicationsPage />} />
