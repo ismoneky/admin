@@ -78,10 +78,20 @@ function formatAmount(record: Booking): string {
   return record.amount == null ? '—' : `¥${(record.amount / 100).toFixed(2)}`
 }
 
+/**
+ * 管理员直退的显隐条件，必须与后端 `initiateRefundAsAdmin` 的校验保持一致
+ * （所见即所能做；后端才是安全边界，这里只是不渲染按钮）。
+ *
+ * `expired` 自 2026-09-14 起放开：过期订单虽然走「用户申请 → 管理员审核」，
+ * 但客服场景需要人工兜底，此时申请时限与「驳回即终态」不该拦住管理员。
+ * 资金侧由退款二级密码把守。详见 booking.service.ts 的 initiateRefundAsAdmin。
+ */
 function canAdminRefundBooking(record: Booking | null): record is Booking {
   return Boolean(
     record
-    && (record.status === 'confirmed' || record.status === 'completed')
+    && (record.status === 'confirmed'
+      || record.status === 'completed'
+      || record.status === 'expired')
     && record.paymentStatus === 'paid'
     && !record.isFree
     && (record.refundStatus === 'none' || record.refundStatus === 'failed'),
