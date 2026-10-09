@@ -32,13 +32,27 @@ test('validation identifies the erroneous point, preserves zero positions, and a
   assert.equal(model.validateDraft(doc).pointId, 'p1')
   point.name = '入口'
   point.categories = ['entrance', 'parking']
+  point.latitude = 0
+  point.longitude = 0
   assert.equal(model.validateDraft(doc), null)
   point.latitude = 35
+  point.longitude = null
   assert.match(model.validateDraft(doc).message, /经纬度/)
   point.longitude = 114
   assert.equal(model.validateDraft(doc), null)
   point.imageUrl = 'javascript:alert(1)'
   assert.match(model.validateDraft(doc).message, /HTTPS/)
+})
+
+test('every point requires valid navigation coordinates before publishing', () => {
+  const doc = guide()
+  const point = { ...model.newGuidePoint('required-location', { x: 0.5, y: 0.5 }, 0), name: '游客中心', categories: ['entrance'] }
+  doc.points = [point]
+  assert.match(model.validateDraft(doc).message, /经纬度/)
+  point.latitude = 35.7
+  assert.match(model.validateDraft(doc).message, /经纬度/)
+  point.longitude = 114.1
+  assert.equal(model.validateDraft(doc), null)
 })
 
 test('image replacement retains or clears points only as requested and updates dimensions', () => {
@@ -51,6 +65,14 @@ test('image replacement retains or clears points only as requested and updates d
   assert.equal(retained.imageHeight, 600)
   assert.equal(model.replaceGuideImage(doc, nextImage, true).points.length, 0)
   assert.equal(doc.points.length, 1)
+})
+
+test('editor navigation opens point details on selection and returns to the list without losing selection', () => {
+  const initial = { selectedId: null, panel: 'points' }
+  const selected = model.reduceGuideEditorNavigation(initial, { type: 'select-point', id: 'p2' })
+  assert.deepEqual(selected, { selectedId: 'p2', panel: 'details' })
+  assert.deepEqual(model.reduceGuideEditorNavigation(selected, { type: 'show-points' }), { selectedId: 'p2', panel: 'points' })
+  assert.deepEqual(model.reduceGuideEditorNavigation(selected, { type: 'clear-selection' }), initial)
 })
 
 test('a missing map, invalid category, and duplicate ids cannot be published', () => {

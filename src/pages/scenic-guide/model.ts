@@ -33,6 +33,17 @@ export interface GuideDocument {
 }
 export interface GuideImage { imageUrl: string; width: number; height: number }
 export interface Position { x: number; y: number }
+export interface GuideEditorNavigation { selectedId: string | null; panel: 'points' | 'details' }
+export type GuideEditorNavigationAction =
+  | { type: 'select-point'; id: string }
+  | { type: 'show-points' }
+  | { type: 'clear-selection' }
+
+export function reduceGuideEditorNavigation(state: GuideEditorNavigation, action: GuideEditorNavigationAction): GuideEditorNavigation {
+  if (action.type === 'select-point') return { selectedId: action.id, panel: 'details' }
+  if (action.type === 'clear-selection') return { selectedId: null, panel: 'points' }
+  return { ...state, panel: 'points' }
+}
 
 export function imagePoint(clientX: number, clientY: number, rect: { left: number; top: number; width: number; height: number }): Position | null {
   if (rect.width <= 0 || rect.height <= 0) return null
@@ -73,8 +84,8 @@ export function validateDraft(doc: GuideDocument, imageValidator = isImageUrl): 
     if (p.description.length > 500 || p.address.length > 200) return error(`${p.name}简介最多500字、地址最多200字`)
     const hasLat = p.latitude !== undefined && p.latitude !== null
     const hasLng = p.longitude !== undefined && p.longitude !== null
-    if (hasLat !== hasLng) return error(`${p.name}经纬度须同时填写或同时留空`)
-    if (hasLat && (!Number.isFinite(p.latitude) || !Number.isFinite(p.longitude) || p.latitude! < -90 || p.latitude! > 90 || p.longitude! < -180 || p.longitude! > 180)) return error(`${p.name}经纬度范围不正确`)
+    if (!hasLat || !hasLng) return error(`${p.name}请填写导航经纬度`)
+    if (!Number.isFinite(p.latitude) || !Number.isFinite(p.longitude) || p.latitude! < -90 || p.latitude! > 90 || p.longitude! < -180 || p.longitude! > 180) return error(`${p.name}经纬度范围不正确`)
   }
   if (new TextEncoder().encode(JSON.stringify(doc)).length > 180 * 1024) return { message: '导览内容过大，请缩短地点简介或图片链接' }
   return null

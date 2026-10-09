@@ -8,18 +8,18 @@ export class DemoError extends Error {
 }
 
 function seed(revision: number): GuideDocument {
-  const examples: [string, number, number, GuideCategory[] , string][] = [
-    ['风启之门', .779, .267, ['entrance', 'parking', 'toilet'], '景区入口 · 游客服务中心。可在这里咨询、停车和休整。'],
-    ['观景驿站', .85, .38, ['station', 'parking', 'toilet'], '沿途观景休憩点。'],
-    ['摩友驿站', .849, .571, ['station', 'spot'], '摩友咖啡屋 · 风车天路打卡点。'],
-    ['天路风野营地', .541, .728, ['camp', 'parking', 'toilet'], '露营区 · 驿站休息。'],
-    ['天路云顶驿站', .179, .741, ['station', 'parking', 'toilet'], '靠近西侧出口，可停车休息。'],
+  const examples: [string, number, number, number, number, GuideCategory[] , string][] = [
+    ['风启之门', .779, .267, 35.77794175, 114.14446553, ['entrance', 'parking', 'toilet'], '景区入口 · 游客服务中心。可在这里咨询、停车和休整。'],
+    ['观景驿站', .85, .38, 35.7708, 114.1321, ['station', 'parking', 'toilet'], '沿途观景休憩点。'],
+    ['摩友驿站', .849, .571, 35.7621, 114.1184, ['station', 'spot'], '摩友咖啡屋 · 风车天路打卡点。'],
+    ['天路风野营地', .541, .728, 35.7539, 114.0836, ['camp', 'parking', 'toilet'], '露营区 · 驿站休息。'],
+    ['天路云顶驿站', .179, .741, 35.745443, 114.043167, ['station', 'parking', 'toilet'], '靠近西侧出口，可停车休息。'],
   ]
   return {
     title: '风车天路景区导览', imageUrl: '/__guide-demo/images/reference.jpg', imageWidth: 2412, imageHeight: 1280,
     revision, updatedAt: null,
-    points: examples.map(([name, x, y, categories, description], index) => ({
-      ...newGuidePoint(`demo-${index + 1}`, { x, y }, index), name, categories, description,
+    points: examples.map(([name, x, y, latitude, longitude, categories, description], index) => ({
+      ...newGuidePoint(`demo-${index + 1}`, { x, y }, index), name, latitude, longitude, categories, description,
     })),
   }
 }
